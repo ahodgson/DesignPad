@@ -1,0 +1,14 @@
+<h2>New Object</h2>
+
+<% if @known_object %>
+	<%= errors_for @known_object %>
+<% end %>
+
+<% form_for(:known_object, :url => known_objects_path ) do |form| %>
+<fieldset>
+  <legend>New Object</legend>
+  <%= render :partial => "form", :locals => { :form => form } %>
+  <%= submit_tag "Create", :class => "submit" %>
+  <button type="button" onclick="location.href='/projects/<%= session[:project_id] %>'" >Back</button>
+</fieldset>
+<% end %>

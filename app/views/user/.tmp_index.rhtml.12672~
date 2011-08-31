@@ -1,0 +1,73 @@
+<h1>User Hub</h1>
+
+<div id="left_column">
+	<div class="sidebar_box">
+    <h2>
+      <span class="header">Basic Information</span>
+      <span class="edit_link"><%= link_to "(edit)", :action => "edit" %></span>
+      <br clear="all" />
+    </h2>
+    <div class="sidebar_box_contents">
+      <table>
+        <tr>
+          <td class="label">Screen name:</td>
+          <td><%= @user.screen_name %></td>
+        </tr>
+        <tr>
+          <td class="label">Email:</td>
+          <td><%= @user.email %></td>
+        </tr>
+        <tr>
+          <td class="label">Password:</td>
+          <td>********</td>
+        </tr>
+      </table>  
+    </div>
+  </div>
+  <div class="sidebar_box">
+    <h2>
+      <span class="header">Specific Information</span>
+      <span class="edit_link">
+        <%= link_to "(edit)", :controller => "spec", :action => "edit" %>
+      </span>
+      <br clear="all" />
+    </h2>
+    <div class="sidebar_box_contents">
+      <table>
+        <%= render :partial    => "spec/field_row", 
+                   :collection => Spec::ALL_FIELDS %>
+      </table> 
+    </div>
+  </div>
+  
+  
+  <div class="sidebar_box">
+    <h2>
+      <span class="header">Design Menu</span>
+      <br clear="all" />
+    </h2>
+    <div class="sidebar_box_contents">
+      <table>
+        <%= render :partial=> "menu_row" %>
+      </table> 
+    </div>
+  </div>
+  
+</div>
+<div id="main_content">
+  <div id="full_name">
+    <%= h @spec.full_name.or_else("Your Name") %>
+  </div>
+  <div id="occupation">
+    <%= h @spec.student_number.or_else("Your Student Number") %>
+  </div> 
+  <span class="edit_link">
+    <%= link_to "(edit)", :controller => "spec", :action => "edit" %>
+  </span>
+
+  <hr noshade />
+  <%= link_to "User Profile", profile_for(@user) %>
+  <hr noshade />
+
+  <!--bio here-->
+</div>

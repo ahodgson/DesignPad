@@ -1,0 +1,65 @@
+<style type="text/css">
+  #whole_page {
+    width: 100%;
+  }
+</style>
+
+<h2>
+	<span class="project_name">
+		Edit Project: <%= link_to @title, project_path(@project) %>
+	</span>
+</h2>
+
+<span class="project_delete_link">
+  <% if @project.user==@user %>
+    <b><%= link_to "(delete)", project_path(@project),
+					:method=>:delete, 
+					:confirm=>"Are you sure to delete this project?" %>
+	</b>
+  <% end %>
+</span>
+
+<br clear="all"/>
+<dl>
+	<dt>Description:</dt>
+	<dd>
+		<%= @project.description %>
+	</dd>
+</dl>
+
+<hr/>
+
+<div id="project_edit_content">
+	<%= render :partial=>"project_tree_area", :locals=>{:project=>@project} %>
+	<%= render :partial=>"project_view_area", :locals=>{:project=>@project} %>
+	<%= render :partial=>"known_objects_list_area", :locals=>{:project=>@project} %>
+</div>
+  
+<br clear="all"/>
+<br/>
+<%= link_to 'Back', :controller=>"projects", :action=>"index" %>
+
+<%= javascript_tag "if(#{not @concept_id.nil?})
+                      click($('#{@concept_id}_concept_list_title'));
+                    else if(#{not @concept_category_id.nil?})
+                      click($('#{@concept_category_id}_concept_category_list_title'));
+                    else if(#{not @function_id.nil?})
+                      click($('#{@function_id}_function_list_title'));
+                    else if(#{not @function_structure_diagram_id.nil?})
+                      click($('#{@function_structure_diagram_id}_function_structure_diagram_list_title'));
+                    else if(#{not @project_id.nil?})
+                      click($('#{@project_id}_project_list_title'));
+
+                    projectEditOnLoad();" %>
+
+<div id="pop_menu" class="pop_menu" align="center"></div>
+<div id="object_pop_menu" class="pop_menu" align="center"></div>
+
+<!--
+  <table>
+    <tr><td><a>Insert</a></td></tr>
+    <tr><td><a>Edit</a></td></tr>
+    <tr><td><a>Delete</a></td></tr>
+  </table>
+-->
+

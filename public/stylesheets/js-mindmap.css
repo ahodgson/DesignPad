@@ -1,0 +1,44 @@
+  
+  .js-mindmap-active .node {
+    position:absolute;
+    top:0;
+    left:0;
+    font-family:verdana;
+    font-size:11px;
+    color:#003258;
+    background:#C1D1E0;
+        opacity:0.9;
+    padding:15px;
+    border:1px solid #A1B1D0;
+    -webkit-border-radius:10px;
+    -moz-border-radius:3px;
+    cursor:pointer;
+    cursor:hand;
+    z-index:100;
+    list-style:none;
+        width:100px;
+  }
+  .js-mindmap-active .node  a{
+    color:#003258;
+  }
+  .js-mindmap-active .node.active{
+    background:#EAEFF5;
+    color:#003258;
+    font-weight:bold;
+    z-index:1000;
+  }
+  .js-mindmap-active .node.active  a{
+    color:#003258;
+  }
+  .js-mindmap-active img.line {
+    position:absolute;
+    width:200px;
+    height:133px;
+    top:0;
+    left:0;
+    display:block;
+    z-index:0;
+  }
+    .ui-draggable {
+        position:absolute;
+    }

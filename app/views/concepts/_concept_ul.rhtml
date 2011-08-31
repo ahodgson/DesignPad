@@ -1,0 +1,7 @@
+<% function_structure_diagram=concept.function_structure_diagram %>
+
+<% if function_structure_diagram.exist? %>
+  <ul class='concept_ul' id='<%= concept.id.to_s %>_concept_ul'>
+    <%= render :partial=>"function_structure_diagrams/function_structure_diagram_li", :locals=>{:function_structure_diagram=>function_structure_diagram} %>
+ </ul>
+<% end %>

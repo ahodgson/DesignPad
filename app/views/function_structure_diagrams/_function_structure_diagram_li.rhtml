@@ -1,0 +1,61 @@
+<li class='function_structure_diagram_li' id='<%= function_structure_diagram.id.to_s %>_function_structure_diagram_li'>
+  <span class='expansion_mark' id='<%= function_structure_diagram.id.to_s %>_function_structure_diagram_expansion_mark'></span>
+  <span class='function_structure_diagram_icon icon' id='<%= function_structure_diagram.id.to_s %>_function_structure_diagram_icon'><img src='<%= FunctionStructureDiagram::ICON_PATH %>' /></span>
+  <span class='function_structure_diagram_list_title list_title' id='<%= function_structure_diagram.id.to_s %>_function_structure_diagram_list_title'><%= function_structure_diagram.name %></span>
+ <a style="display:none"><%= function_structure_diagram.name %></a> 
+ <%= render :partial=>"function_structure_diagrams/function_structure_diagram_ul", :locals=>{:function_structure_diagram=>function_structure_diagram} %>
+
+  
+  <% super_id_name = function_structure_diagram.is_for_project? ? 'project_id' : 'concept_id' %>
+  <% super_id_value = function_structure_diagram.is_for_project? ? function_structure_diagram.project.id : function_structure_diagram.concept.id %>
+  <%= javascript_tag "addEventById('#{function_structure_diagram.id.to_s}_function_structure_diagram_list_title', 'click',
+    function(event){
+
+      makeUniqueClass('selected_list_title', $('#{function_structure_diagram.id.to_s}_function_structure_diagram_list_title'));
+      resetProjectEditPage();
+
+      pictureClue(#{function_structure_diagram.has_picture?})
+
+      // global variables to facilitate onKeyUp()
+      sibSize=#{FunctionStructureDiagram::NAME_SIZE};
+      sibMaxLength=#{FunctionStructureDiagram::NAME_MAX_LENGTH};
+      sibDefaultText='New FSD';
+      sibModel='function_structure_diagram';
+      sibSubmitUrl='#{url_for(:controller=>"function_structure_diagrams", :action=>"create")}'
+      superIdName='#{super_id_name}'
+      superIdValue=#{super_id_value}
+
+      subSize=#{Function::NAME_SIZE};
+      subMaxLength=#{Function::NAME_MAX_LENGTH};
+      subDefaultText='New Function';
+      subModel='function';
+      subSubmitUrl='#{url_for(:controller=>"functions", :action=>"create")}'
+      selfIdName='function_structure_diagram_id'
+      selfIdValue=#{function_structure_diagram.id}
+
+      //removeEventById(document, 'keyup', onKeyUp, false);
+      //addEventById(document, 'keyup', onKeyUp, false);
+
+      #{remote_function(:url=>{:controller => 'function_structure_diagrams', :action=> 'when_list_title_clicked', :function_structure_diagram_id=>function_structure_diagram.id})};
+    },
+    false);" %>
+
+  <%= javascript_tag "$('#{function_structure_diagram.id.to_s}_function_structure_diagram_list_title').onmouseover=function(){removeHover()};" %>
+
+  <%= javascript_tag "$('#{function_structure_diagram.id.to_s}_function_structure_diagram_list_title').oncontextmenu=
+    function(event){
+
+      var evt=getUnifiedEvent(event);
+
+      if(!isOfClass('selected_list_title', this))
+        click(this);
+      else
+        projectEditOnClick(evt);
+
+      #{pop_menu('function_structure_diagram', function_structure_diagram, FunctionStructureDiagram::NAME_SIZE, FunctionStructureDiagram::NAME_MAX_LENGTH)}
+      showContextMenu(this, evt, $('pop_menu'));
+
+      //disable default firefox menu
+      return false;
+    }" %>
+</li>

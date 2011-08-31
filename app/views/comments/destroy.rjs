@@ -1,0 +1,6 @@
+page.visual_effect :Squish, "comment_#{@comment.id}"  #Puff, Fold, Squish, SwitchOff
+#page<<"jQuery('#comment_#{@comment.id}').hide('puff', {}, 1000);"
+
+page.delay(1) do
+  page.remove "comment_#{@comment.id}"
+end

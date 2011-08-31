@@ -1,0 +1,40 @@
+object_ownership1:
+  id: 1001
+  function_structure_diagram_id: 1000
+  known_object_id: 1001
+object_ownership2:
+  id: 1002
+  function_structure_diagram_id: 1000
+  known_object_id: 1002
+object_ownership3:
+  id: 1003
+  function_structure_diagram_id: 1000
+  known_object_id: 1003
+object_ownership4:
+  id: 1004
+  function_structure_diagram_id: 1001
+  known_object_id: 1004
+object_ownership5:
+  id: 1005
+  function_structure_diagram_id: 1002
+  known_object_id: 1005
+object_ownership6:
+  id: 1006
+  function_structure_diagram_id: 1003
+  known_object_id: 1006
+object_ownership7:
+  id: 1007
+  function_structure_diagram_id: 1001
+  known_object_id: 1007
+object_ownership8:
+  id: 1008
+  function_structure_diagram_id: 1001
+  known_object_id: 1001
+object_ownership9:
+  id: 1009
+  function_structure_diagram_id: 1002
+  known_object_id: 1001
+object_ownership10:
+  id: 1010
+  function_structure_diagram_id: 1003
+  known_object_id: 1005

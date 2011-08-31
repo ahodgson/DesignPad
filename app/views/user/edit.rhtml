@@ -1,0 +1,35 @@
+<h2>Edit Basic Information</h2>
+<% if @team %>
+	<%= errors_for :user %>
+<% end %>
+<%= form_for :user do |form|%>
+<fieldset>
+	<legend>Update Your Email</legend>
+	<%= hidden_field_tag "attribute", "email", :id=>nil%>
+	<%= render :partial=>"email_field_row", :locals => {:form=> form }%>
+	<%= submit_tag "Update", :class=>"submit"%>		
+</fieldset>
+<%end%>
+ 
+<%= form_for :user do |form|%>
+<fieldset>
+	<legend>Update Your Password</legend>
+	<%= hidden_field_tag "attribute", "password", :id=>nil%>
+	
+	<%= render  :partial=>"password_field_row", 
+				:locals=>{ :form=>form,
+						   :field=>"current_password"}%>
+	
+	<%= render  :partial=>"password_field_row", 
+				:locals=>{ :form=>form,
+						   :field=>"password",
+						   :field_title => "New password"}%>
+	
+	<%= render  :partial=>"password_field_row", 
+				:locals=>{ :form=>form,
+						   :field=>"password_confirmation",
+						   :field_title => "Confirm"}%>
+	
+	<%= submit_tag "Update", :class=>"submit"%>		
+</fieldset>
+<%end%>

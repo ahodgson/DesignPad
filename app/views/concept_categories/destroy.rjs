@@ -1,0 +1,25 @@
+#page.visual_destroy("#{@concept_category.id}_concept_category_li", "#{@concept_category.function.id}_function_list_title")
+
+page<<"click($('#{@concept_category.function.id}_function_list_title'))"
+page.replace "#{@concept_category.id}_concept_category_li",
+  "<li class='concept_category_li' id='tmp'>
+    <span class='expansion_mark'></span>
+    <span class='concept_category_icon icon'><img src='#{ConceptCategory::ICON_PATH}' /></span>
+    <span class='concept_category_list_title list_title'>#{@concept_category.name}</span>
+  </li>"
+page.visual_effect(:Squish, 'tmp')
+page.delay(1) do
+  page.remove 'tmp'
+  page<<"addExpansionMarksForUL($('#{@function.no_category().id.to_s}_concept_category_li').parentNode);"
+end
+
+if @concepts.length>0
+  # visual effect to insert them to the unclassified
+  page.replace @function.no_category().id.to_s+'_concept_category_li', :partial=>"concept_categories/concept_category_li", :locals=>{:concept_category=>@function.no_category()}
+ 
+  page.show @function.no_category().id.to_s+'_concept_category_ul'
+  @concepts.each do |concept|
+    page.visual_effect(:grow, concept.id.to_s+'_concept_li', :duration=>1)
+  end
+end
+

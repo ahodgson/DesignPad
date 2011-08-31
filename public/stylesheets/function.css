@@ -1,0 +1,36 @@
+/* Function edit style */
+
+#functionLeftColumn
+{
+    float: left;
+    margin-left: 15px;
+    width: 25em;
+}
+
+#functionShortForm select{
+    width: 150px;
+}
+
+#function_description fieldset{
+    max-width: 570px;
+    max-height: 130px;
+}
+#function_short_form fieldset{
+    max-width: 570px;
+    max-height: 140px;
+}
+
+#function_description_clue, #function_short_form_clue{
+    color: blue;
+    font-weight:bold;
+}
+
+.function_module{
+    -moz-border-radius:10px;
+    padding: 10px;
+    border: 1px solid white;
+    background-color:navy;
+    color:white;
+    cursor:move;
+    float:left;
+}

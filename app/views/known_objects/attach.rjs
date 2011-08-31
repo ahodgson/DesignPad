@@ -1,0 +1,9 @@
+if @condition=="available_object"
+  page.replace @known_object.id.to_s+'_known_object_li', :partial=>"known_objects/known_object_li", :locals=>{:known_object=>@known_object, :function_structure_diagram=>@function_structure_diagram, :entity_model_name=>@entity_model_name}
+elsif @condition=="unavailable_object"
+  page.refresh_available_objects(@function_structure_diagram, @entity_model_name)
+end
+#page.delay() do
+  #page<<"click($('#{@known_object.id.to_s}_known_object_list_title'))"
+#end
+page<<"cancelHighlightedSynergy();"

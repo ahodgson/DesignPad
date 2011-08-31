@@ -1,0 +1,3 @@
+page.instant_create(@function, "function")
+
+

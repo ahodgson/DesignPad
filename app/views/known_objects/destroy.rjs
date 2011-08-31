@@ -1,0 +1,4 @@
+page.visual_destroy("#{@known_object.id}_known_object_li")
+page<<"cancelHighlightedSynergy();"
+
+

@@ -1,0 +1,4 @@
+page.replace_html "newProject", :partial=>"new"
+page.hide "newProject"
+page.visual_effect :blind_down, "newProject"
+page.draggable "newProject"

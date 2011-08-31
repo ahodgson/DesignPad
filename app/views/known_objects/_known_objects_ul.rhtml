@@ -1,0 +1,17 @@
+<%= javascript_tag "synergies=[]; //hash table" %>
+
+<% ordered_all_known_objects=function_structure_diagram.ordered_all_known_objects(session[:project_id]) %>
+<% available_known_objects=function_structure_diagram.available_known_objects %>
+<% unavailable_known_objects=ordered_all_known_objects-available_known_objects %>
+
+<ul id="available_known_objects_ul">
+  <% available_known_objects.each do |known_object| %>
+    <%= render :partial=>"known_objects/known_object_li", :locals=>{:known_object=>known_object, :function_structure_diagram=>function_structure_diagram, :entity_model_name=>entity_model_name} %>
+  <% end %>
+</ul>
+
+<ul id="unavailable_known_objects_ul">
+  <% unavailable_known_objects.each do |known_object| %>
+    <%= render :partial=>"known_objects/known_object_li", :locals=>{:known_object=>known_object, :function_structure_diagram=>function_structure_diagram, :entity_model_name=>entity_model_name} %>
+  <% end %>
+</ul>

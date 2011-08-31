@@ -1,0 +1,9 @@
+<% functions=function_structure_diagram.functions %>
+
+<% unless functions.length==0 %>
+  <ul class='function_structure_diagram_ul' id='<%= function_structure_diagram.id.to_s %>_function_structure_diagram_ul'>
+    <% functions.each do |function| %>
+      <%= render :partial=>"functions/function_li", :locals=>{:function=>function} %>
+    <% end %>
+  </ul>
+<% end %>

@@ -1,0 +1,154 @@
+<h1>About Us</h1>
+<p>Under construction...</p>
+
+
+<!-- js 画板 -->
+<body style="margin:0px;"> 
+</body> 
+<script> 
+function DrawingBoard(width,height,size) 
+{ 
+size=size||3 
+var container=document.createElement("div"); 
+this.container=container; 
+container.runtimeStyle.width=(width)*size+"px"; 
+container.runtimeStyle.height=(height)*size+"px"; 
+container.runtimeStyle.margin="0px"; 
+//container.style.border="solid 1px blue"; 
+var count=0; 
+for(var y=0;y<height;y++) 
+{ 
+for(var x=0;x<width;x++) 
+{ 
+var curr=document.createElement("div"); 
+curr.runtimeStyle.height=size+"px"; 
+curr.runtimeStyle.width=size+"px"; 
+curr.runtimeStyle.display="inline"; 
+curr.runtimeStyle.overflow="hidden"; 
+curr.style.backgroundColor="green"; 
+curr.src=""; 
+container.appendChild(curr); 
+} 
+} 
+//alert(curr.currentStyle.display); 
+//document.body.appendChild(container); 
+this.drawLine=function(start,end,color) 
+{ 
+var dx=start[0]-end[0]; 
+var dy=start[1]-end[1]; 
+var x,y; 
+if( Math.abs(dx) > Math.abs(dy) ) 
+{ 
+for(var x=start[0];x!=end[0]+(end[0]-start[0])/Math.abs(end[0]-start[0]);x+=
+
+(end[0]-start[0])/Math.abs(end[0]-start[0]) ) 
+{ 
+y=Math.round((x-start[0])/dx*dy+start[1]); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+} 
+} 
+else 
+{ 
+for(var y=start[1];y!=end[1]+(end[1]-start[1])/Math.abs(end[1]-start[1]);y+=
+
+(end[1]-start[1])/Math.abs(end[1]-start[1]) ) 
+{ 
+x=Math.round((y-start[1])/dy*dx+start[0]); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+} 
+} 
+} 
+this.drawCircle=function(m,R,color) 
+{ 
+for(var r=0;r<=Math.floor(Math.sqrt(R*R-r*r));r++) 
+{ 
+x=m[0]+r;y=m[1]+Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+x=m[0]-r;y=m[1]+Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+x=m[0]+r;y=m[1]-Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+x=m[0]-r;y=m[1]-Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+y=m[1]+r;x=m[0]+Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+y=m[1]-r;x=m[0]+Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+y=m[1]+r;x=m[0]-Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+y=m[1]-r;x=m[0]-Math.floor(Math.sqrt(R*R-r*r)); 
+this.container.childNodes[this.trans([x,y])].style.backgroundColor=color; 
+} 
+
+} 
+this.appendto=function(parent) 
+{ 
+parent.appendChild(this.container); 
+} 
+this.drawPoint=function(p,color) 
+{ 
+this.container.childNodes[this.trans(p)].style.backgroundColor=color; 
+} 
+this.trans=function(p) 
+{ 
+return p[0]+p[1]*width; 
+} 
+container=null; 
+} 
+function Console(width,height,command) 
+{ 
+var container=document.createElement("div"); 
+this.container=container; 
+container.runtimeStyle.width=(width); 
+container.runtimeStyle.height=(height); 
+container.runtimeStyle.margin="0px"; 
+container.runtimeStyle.backgroundColor="black"; 
+container.runtimeStyle.fontFamily="Terminal"; 
+container.runtimeStyle.color="white"; 
+container.runtimeStyle.fontSize="16px"; 
+this.output=document.createElement("div"); 
+container.appendChild(this.output); 
+container.innerHTML+="js>" 
+this.input=document.createElement("input"); 
+container.appendChild(this.input); 
+this.input.runtimeStyle.backgroundColor="black"; 
+this.input.runtimeStyle.borderWidth="0px"; 
+this.input.runtimeStyle.color="white"; 
+this.input.runtimeStyle.fontFamily="Terminal"; 
+this.input.runtimeStyle.width="90%" 
+this.input.runtimeStyle.fontSize="16px" 
+this.input.runtimeStyle.position="relative"; 
+this.input.runtimeStyle.top="2px"; 
+command=command||function(str) 
+{ 
+var e; 
+try{ 
+var r=eval(str); 
+} catch(e) { 
+return "Bad command"; 
+} 
+return r; 
+} 
+this.run=function(str) 
+{ 
+this.input.parentNode.childNodes[0].innerHTML+=str+'<br/>' 
+this.input.parentNode.childNodes[0].innerHTML+=(command(str)+"<br/>") 
+} 
+this.input.command=function() 
+{ 
+this.parentNode.childNodes[0].innerHTML+=this.value+'<br/>' 
+this.parentNode.childNodes[0].innerHTML+=(command(this.value)+"<br/>") 
+} 
+this.input.onkeyup=new Function("e","e=e||event;if(e.keyCode!=13) return;this.command();this.value='';"); 
+this.appendto=function(parent) 
+{ 
+parent.appendChild(this.container); 
+} 
+container=null; 
+} 
+var c=new Console("100%","50%"); 
+c.appendto(document.body); 
+c.run("window.db=new DrawingBoard(100,100);document.body.appendChild(db.container);"); 
+</script>
+
+

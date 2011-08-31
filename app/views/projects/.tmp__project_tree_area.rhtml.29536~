@@ -1,0 +1,17 @@
+<div id="project_tree_area">
+  <fieldset>
+    <legend>Project Tree</legend>
+    <div id="project_tree_content">
+      <%= render :partial=>"root_ul", :locals=>{:project=>project} %>
+      <%#= generate_root_tree(project) %>
+      <%#= javascript_tag "addIcons($('#{project.id.to_s}_root_ul'))" %>
+      <%= javascript_tag "addExpansionMarksForUL($('#{project.id.to_s}_root_ul'))" %>
+      <%#= javascript_tag "makeConceptDraggables($('#{project.id.to_s}_root_ul')); //one-time-global" %>
+      <%#= javascript_tag "makeConceptCategoryDroppables($('#{project.id.to_s}_root_ul')); //one-time-global" %>
+    </div>
+    <div id="project_tree_operations">
+      <button type="button" onclick="foldAll($('<%= project.id.to_s %>_root_ul'))">fold all</button>
+      <button type="button" onclick="unfoldAll($('<%= project.id.to_s %>_root_ul'))">unfold all</button>
+    </div>
+  </fieldset>
+</div>

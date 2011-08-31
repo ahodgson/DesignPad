@@ -1,0 +1,10 @@
+<% concepts=concept_category.concepts %>
+
+<% unless concepts.length==0 %>
+  <ul class='concept_category_ul' id='<%= concept_category.id.to_s %>_concept_category_ul'>
+    <% concepts.each do |concept| %>
+      <%= render :partial=>"concepts/concept_li", :locals=>{:concept=>concept} %>
+    <% end %>
+  </ul>
+<% end %>
+

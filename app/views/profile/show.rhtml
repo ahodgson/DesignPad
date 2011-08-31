@@ -1,0 +1,15 @@
+<div id="left_column">  
+  <!--user picture-->   
+</div>
+
+<div id="main_content">
+  <div id="full_name">
+    <%= h @spec.full_name.or_else(@user.screen_name) %>
+  </div>
+  <div id="occupation">
+    <%= h @spec.student_number %>
+  </div> 
+  
+  <hr noshade />              
+</div>
+

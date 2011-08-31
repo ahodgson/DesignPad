@@ -1,0 +1,2 @@
+page.instant_update(@known_object, "known_object", {:function_structure_diagram=>@function_structure_diagram, :entity_model_name=>@entity_model_name})
+

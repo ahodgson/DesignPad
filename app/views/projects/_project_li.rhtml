@@ -1,0 +1,47 @@
+<li class='project_li' id='<%= project.id.to_s %>_project_li'>
+  <span class='expansion_mark' id='<%= project.id.to_s %>_project_expansion_mark'></span>
+  <span class='project_icon icon' id='<%= project.id.to_s %>_project_icon'><img src='<%= Project::ICON_PATH %>' /></span>
+  <span class='project_list_title list_title' id='<%= project.id.to_s %>_project_list_title'><%= project.name %></span>
+  <a style="display:none"><%= project.name %></a>
+  <%= render :partial=>"projects/project_ul", :locals=>{:project=>project} %>
+
+  <!-- Clicking -->
+  <%= javascript_tag "addEventById('#{project.id.to_s}_project_list_title', 'click',
+    function()
+    {
+      makeUniqueClass('selected_list_title', $('#{project.id.to_s}_project_list_title'));
+      resetProjectEditPage();
+
+      // global variables to facilitate onKeyUp()
+      subSize=#{FunctionStructureDiagram::NAME_SIZE};
+      subMaxLength=#{FunctionStructureDiagram::NAME_MAX_LENGTH};
+      subDefaultText='New FSD';
+      subModel='function_structure_diagram';
+      subSubmitUrl='#{url_for(:controller=>"function_structure_diagrams", :action=>"create")}'
+      selfIdName='project_id'
+      selfIdValue=#{project.id}
+
+      #{remote_function(:url=>{:controller => 'projects', :action=> 'when_list_title_clicked', :project_id=>project.id})}
+    },
+    false);" %>
+
+  <%= javascript_tag "$('#{project.id.to_s}_project_list_title').onmouseover=function(){removeHover()};" %>
+
+  <%= javascript_tag "$('#{project.id.to_s}_project_list_title').oncontextmenu=
+    function(event){
+
+      var evt=getUnifiedEvent(event);
+
+      if(!isOfClass('selected_list_title', this))
+        click(this);
+      else
+        projectEditOnClick(evt);
+
+      #{pop_menu('project', project, Project::NAME_SIZE, Project::NAME_MAX_LENGTH)}
+      showContextMenu(this, evt, $('pop_menu'));
+
+      //disable default firefox menu
+      return false;
+    }" %>
+
+</li>

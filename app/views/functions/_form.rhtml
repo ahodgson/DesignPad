@@ -1,0 +1,8 @@
+<div class="form_row">
+  <label for="name">Function:</label>
+  <%= form.text_field :name, :size=>Function::NAME_SIZE %>
+</div>
+<div class="form_row">
+  <label for="description">Extended Definition:</label>
+  <%= form.text_area :description, :rows => 3, :cols => 30 %>
+</div>

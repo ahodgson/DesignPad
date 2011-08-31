@@ -1,0 +1,16 @@
+<% remote_form_for(:concept_category, :url=>concept_categories_path) do |form| %>
+<fieldset>
+  <legend>New Concept Category</legend>
+  Name:<br/>
+  <%= form.text_field :name, :size=>ConceptCategory::NAME_SIZE%><br/>
+  Description:<br/>
+  <%= form.text_area :description, :rows => 1, :cols => 20 %><br/>
+  <%= submit_tag "Create" %>
+  <%= button_to_function "Cancel" do |page|
+        page.visual_effect :shrink, "newCategory"
+        page.show "createLinkSelection"
+      end
+  %>
+</fieldset>
+<% end %>
+

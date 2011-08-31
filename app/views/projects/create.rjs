@@ -1,0 +1,9 @@
+
+page.visual_effect :shrink, "newProject"
+page.replace :projects_list, :partial=>"projects/projects_list", :locals=>{:projects=>@projects}
+
+# if want to only refresh a line, use this statement instead of refreshing the whole partial
+#page.insert_html :top, "projectList", "<li id='project_"+@project.id.to_s+"'>"+link_to(@project.name, project_path(@project.id))+"</li>"
+
+page.visual_effect :highlight, "project_"+@project.id.to_s
+page.visual_effect :pulsate, "project_"+@project.id.to_s

@@ -1,0 +1,17 @@
+/* new Team form */
+#newTeam{
+    cursor: -moz-grab;
+
+ /*   position:absolute;
+    z-index: 1000;
+    top: 290px;
+    left: 560px; */
+}
+
+#newTeam fieldset{
+    width: 300px;
+}
+
+#errorMessageForTeamName{
+    color:red;
+}

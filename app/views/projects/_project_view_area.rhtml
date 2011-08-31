@@ -1,0 +1,20 @@
+<div id="project_view_area">
+  <fieldset id="project_view_fieldset">
+    <legend id="project_view_legend">View</legend>
+    <div id="project_view_content"></div>
+    <span id="project_view_clue"></span>
+    <span id="project_view_operations"></span>
+    <br clear="all" />
+    <div id="comments_area" style="display:none;"></div>
+
+    <%= javascript_tag "$('project_view_content').onmouseover=
+      function(){
+        addClass('hovered_content', this);
+      }" %>
+
+    <%= javascript_tag "$('project_view_content').onmouseout=
+      function(){
+        removeClass('hovered_content', this);
+      }" %>
+  </fieldset>
+</div>

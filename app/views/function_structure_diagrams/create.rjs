@@ -1,0 +1,1 @@
+page.instant_create(@function_structure_diagram, "function_structure_diagram")

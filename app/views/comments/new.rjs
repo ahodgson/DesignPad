@@ -1,0 +1,10 @@
+page.hide "add_comment_link"
+form_div = "new_comment_form"
+page.hide form_div
+page.replace_html form_div, :partial => "new", :locals=>{:entity=>@concept, :hidden_tag=>"concept_id"}
+#page<<"jQuery('#new_comment_form').show('slow');"
+page.visual_effect :appear, form_div
+
+page.delay() do
+  page<<"$('comment_body').focus();"
+end

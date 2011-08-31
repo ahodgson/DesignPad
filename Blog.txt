@@ -1,0 +1,389 @@
+1) [FIXED][BUG]Fixed when adding new functions on the tree( the one that looks like a file system)
+	- there was a problem with js, regarding incomplete HEAD information
+	- added this code stub into application.html.erb
+			somewhere in the top: 
+			<%= csrf_meta_tag %>
+			...
+			<script type="text/javascript">
+			  /*
+			 * Registers a callback which copies the csrf token into the
+			 * X-CSRF-Token header with each ajax request.  Necessary to 
+			 * work with rails applications which have fixed
+			 * CVE-2011-0447
+			*/
+
+			Ajax.Responders.register({
+			onCreate: function(request) {
+			  var csrf_meta_tag = $$('meta[name=csrf-token]')[0];
+
+			  if (csrf_meta_tag) {
+				var header = 'X-CSRF-Token',
+					token = csrf_meta_tag.readAttribute('content');
+
+				if (!request.options.requestHeaders) {
+				  request.options.requestHeaders = {};
+				}
+				request.options.requestHeaders[header] = token;
+			  }
+			}
+			});
+			</script>
+	- revisited after installing the legacy plugin
+	- I deleted all the code from above
+	- first I got rid of the inline script 
+	- it still works...
+	- deleted the meta tag, <%= csrf_meta_tag %>
+	- now it fails
+	- added the metatag
+	
+	
+2) [FIXED][BUG]Now the issue was DELETE and EDIT options 
+	- issue was form was posting "/functions/1" 1 is the function that was 
+		supposed to be the function id to be edited
+	- but it seemed to have thought 1 was the action as it is normally
+	- it had something to do when I changed from remote_form_for to form_for for
+		rails 3 uprading porpuses.
+	- from remote_form_for to form_for, added :remote => true with the options( after :before )
+	- this didn't work, had to revert back to remote_form_for
+	- Had to install legacy 
+	- added this on the Gemfile ( Gemfile is located on the main folder for the application eg. ~\design_pad\ )
+		gem 'prototype_legacy_helper', '0.0.0', :git => 'git://github.com/rails/prototype_legacy_helper.git'
+	- then ran 'bundle install' to update
+	
+3) [FIXED][BUG]Issue with Function list and Known Object list on the project show view
+	- Had a lot of issues with
+		<%= collection_select(:known_objects, :id, known_objects, :id, :name, {}, :multiple=>true) %>
+	  and
+		<%= collection_select(:functions, :id, functions, :id, :name, {}, :multiple=>true ) %>
+	- complaining the first :id in the options was not an array
+	- looked up online but nothing with the same issue was found
+	- had alot of trouble with this one
+	- ... easy solution was to not have a plural name on the first option
+	- Changed to 
+		<%= collection_select(:known_object, :id, known_objects, :id, :name, {}, :multiple=>true) %>
+	  and
+		<%= collection_select(:function, :id, functions, :id, :name, {}, :multiple=>true ) %>
+	- problem solved
+	
+4) [FIXED][BUG]Edit button does not work from the project show list (localhost:3000/projects/1#)
+	- Problem was that on the button it says ( ~\app\views\functions\app\_functions_list.rhtml)
+		<%= link_to "Edit ", "javascript: editFunction()"%>
+	- so this function was being called from the application.js file on ~/public/javascripts/
+		function editFunction(){
+			var functionId=singleSelectedId("functions_id");
+			if(functionId)
+				window.location="/functions/"+functionId+";edit"
+		}
+	- as you notice it uses functions_id so i just changed that to function_id
+		function editFunction(){
+			var functionId=singleSelectedId("function_id");
+			if(functionId)
+				window.location="/functions/"+functionId+";edit"
+		}
+	- it solved the problem
+	
+5) [FIXED][BUG]Edit not linking to the correct page from the project show list (localhost:3000/projects/1#)
+	- same button from number 4
+	- revisit the javascript
+		function editFunction(){
+			var functionId=singleSelectedId("function_id");
+			if(functionId)
+				window.location="/functions/"+functionId+";edit"
+		}
+	- if you noticed window.location="/functions/"+functionId+";edit"
+	- that is the url
+	- changed it to window.location="/functions/"+functionId+"/edit"
+	- typo before the word edit
+	
+6) [FIXED][BUG]4 and 5 are the same for known objects. 
+	- applied similar changes to them
+	
+7) [FIXED][BUG]Delete button does not work from the project show list (localhost:3000/projects/1#)
+	- Looking at the code behind the button ( ~\app\views\functions\app\_functions_list.rhtml)
+		<%= link_to_remote "Delete ", :url=>{:controller=>"functions", :action=>"destroy_multiple"},
+									  :with=>"'selected_ids='+selectedIds('functions_id')
+                                      +'&function_structure_diagram_id='+#{function_structure_diagram_id}",
+										:confirm=>"Are you sure?"
+                                    %>
+	- its using 'functions_id'
+	- changed that to 'function_id'
+	- solved
+	
+8) [FIXED][BUG]7 applies to Known objects list too
+	- applied the same change
+
+9) [FIXED][BUG]Can't edit known objects from the edit page
+	- hmmm
+	- don't know why this stub is in the update action (controllers\known_objects_controller)
+		@function_structure_diagram=FunctionStructureDiagram.find(:function_structure_diagram_id)
+		@entity_model_name=params[:entity_model_name]
+	- not sure if we need them for other kinds of updates
+	- we'll have to see later
+	- commented them out
+	- for now, can edit known objects
+	
+10) [FIXED][BUG]Error messages don't show up
+	- error_messages_for has been deprecated in rails 3
+	- check out http://www.emersonlackey.com/article/rails3-error-messages-for-replacement
+	- he wrote a stub to replace it
+	- basically added this to app/helpers/application_helper.rb
+		def errors_for(object, message=nil)
+			html = ""
+			unless object.errors.blank?
+			  html << "<div class='fieldWithErrors #{object.class.name.humanize.downcase}Errors'>\n"
+			  if message.blank?
+				if object.new_record?
+				  html << "\t\t<h5>There was a problem creating the #{object.class.name.humanize.downcase}</h5>\n"
+				else
+				  html << "\t\t<h5>There was a problem updating the #{object.class.name.humanize.downcase}</h5>\n"
+				end    
+			  else
+				html << "<h5>#{message}</h5>"
+			  end  
+			  html << "\t\t<ul>\n"
+			  object.errors.full_messages.each do |error|
+				html << "\t\t\t<li>#{error}</li>\n"
+			  end
+			  html << "\t\t</ul>\n"
+			  html << "\t</div>\n"
+			end
+			html
+		  end  
+	- Now instead of calling errors_messages_for, we call errors_for(@object)
+	- can do errors_for(@object, "message")
+	- replace all calls of error_messages_for to this function call
+	- replaced alot of calls from edit/new files of different views
+	- example change:
+		<% if @team %>
+			<%= errors_for @team %>
+		<% end %>
+
+11) [FIXED][BUG]Layout is broken
+	- something wrong with the layout
+	- it doesnt enclose everything in the main/info page
+	- hmmm probably just the html
+	- had something to do with <%= yield %>, moved it around
+	- fixed
+	
+12) [BUG] Uploading a picture had an error with packet or something
+	- This was in FSD uploading a pic
+	- Not sure what the pic is for 
+	- Hmm gonna look up how to do that
+	- looking up online it seems the fix is downgrading to ruby-mysql 2.9.3
+	- my current version is 2.9.4
+	- actually, am i even using ruby-mysql or just mysql gem, not sure
+	- 
+	
+13) http://motyar.info/blog/2010/01/draw-with-jquery.html
+	- How to draw?
+	- might not be specific to RoR
+	- delving in to canvas tag (fishy on IE support)
+	- hmm http://stackoverflow.com/questions/923885/capture-html-canvas-as-gif-jpg-png-pdf
+	- [too complicated]hmmmm might have to use paperclip plugin to have thumbnails
+	- on canvas, have diff colored pixels, white and black. white is eraser
+	- canvas to image http://ajaxian.com/archives/canvas2image-save-out-your-canvas-data-to-images
+	- good example here http://www.nihilogic.dk/labs/canvas2image/
+	- use html5 -- http://dev.opera.com/articles/view/html5-canvas-painting/
+	- weird, it doesnt recognize my firefox browser
+	- hmmm error, its not that 
+	- its just it doesnt know where to find the javascript
+	- have to search how to add new javascript
+	- I MADE IT DRAW
+	- although right now its.. buggy
+	- cant select pencil, only line
+		- something wrong with select
+		- hmm its select_tag in RoR
+		- check if used select_tag before
+		- nope select_tag hasnt been in code before
+		- it has to do something with the array order
+		- nope, the default was just "line"
+		- done
+	- when drawing line, it moves to the right
+	- IT DOESNT SAVE! how to save? http://stackoverflow.com/questions/2544260/how-to-save-html5-canvas
+	- figured out how the drawing takes place
+	- have to change so that the options are pencil and eraser
+	- [1] Pencil [2] Eraser
+	- just duplicated pencil function but have white color instead
+	- just set context.strokeStyle = "#000";
+	- basically a pencil with white ink
+	- http://diveintohtml5.org/canvas.html#divingin
+	- It works!
+	- Now just have to figure out how to save it so drawing doesnt go away
+	- How to get big eraser? - done. context.lineWidth = 1 ;
+	- hmmmmmmmmmmm
+	- IMAGES! http://patshaughnessy.net/2009/4/14/database-storage-for-paperclip-rewritten-to-use-a-single-table
+	- paperclip plugin
+	- trying to integrate now
+	- issues installing paperclip -_-
+	- typo, easy fix, now inside the gemfile
+	- just do bundle install
+	- now trying to integrate paperclip with the concept model
+	- hmmmm redid all that since the guide was for rails 2
+	- cant do anything with it
+	- looking at this
+	- http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app
+	- did >rails generate paperclip concept avatar to update models
+	- nice video tutorial http://membership.thinkvitamin.com/library/ruby-on-rails/forms/file-uploads-with-paperclip-part-1?cid=106
+	- omg
+	- finally after 5 hours of experimenting
+	- attached a photo to a concept
+	- how? followed the newest link above
+	- display by doing: 
+		<%= image_tag @concept.avatar.url %>
+	- update by doing this:
+		<% form_for(@concept, :url=>{:controller=>"concepts", :action=>"update"}, :html => { :multipart => true }) do |f| %>
+		  <p>
+		   <%= f.file_field :avatar %>
+			<%= submit_tag "Update" %>
+		  </p>
+		<% end %>
+	- this one uses a photo in the computer tho
+	- need to upload
+	- good first step, regardless
+	- need to integrate with the drawing app
+	- how?
+	- have to figure out how to update the photo without using the file_field tag
+	- hmm
+	- IDEA!
+	- basically, upload through URL
+	- meaning the photo doesnt have to be in the computer
+	- imgur.com has this
+	- hmmm trying to see if we can do this using paperclip
+	- wow found a tutorial http://trevorturk.com/2008/12/11/easy-upload-via-url-with-paperclip/
+	- lets see if its relevant (its from 2008)
+	- fixed the showing screen
+	- can now see image on the edit page
+	- fixed edit button (didnt have one)
+	- hmmm trying to see how to delete uploaded photo(concept photo)
+	- success! 
+	- used:
+		<%=link_to "Remove Photo", {:controllers=> 'concepts', :action => 'delete_avatar', :id => @concept.id} %>
+	- had to write a new action for concepts controller
+	- new action in concepts controller:
+		def delete_avatar
+			@concept_id=params[:id]
+			@concept=Concept.find(@concept_id)
+
+			respond_to do |format|
+			  if @concept.update_attribute(:avatar_file_name, nil)
+				flash[:notice]="Avatar has been deleted."
+				format.html {redirect_to :id=>@concept_id, :action=>"edit", :controller=>"concepts"}
+			  else
+				format.html { render :nothing => true }
+			  end
+			end
+		end
+	- bug, delete button shows up even if theres no image
+	- fixed, fix if statement from concept.avatar to concept.avatar_file_name
+	- now the hard part
+	- hmm going back to uploading file using url
+	- following instuctions on this link http://trevorturk.com/2008/12/11/easy-upload-via-url-with-paperclip/
+	- hmm
+	- did everything in tutorial
+	- tried to upload through url, have problems with concept.rb -- undefined method `image=' for #<Concept:0x1b02d60>
+	- it works!
+	- problem was this function		
+		  def download_remote_image
+			self.image = do_download_remote_image
+			self.image_remote_url = image_url
+		  end
+	- designpad didnt have image, changed that to avatar
+	- 2 days of research and nothing
+	- ASKED IN STACKOVERFLOW  http://stackoverflow.com/questions/6264538/rails-how-to-update-avatar-photo-of-a-model-directly
+	- got this code https://gist.github.com/1012107
+			class Avatar < ActiveRecord::Base
+
+		  attr_accessor :content_type, :original_filename, :image_data
+		  before_save :decode_base64_image
+
+		  has_attached_file :image,
+			PAPERCLIP_CONFIG.merge(
+			:styles => {
+			  :thumb => '32x32#',
+			  :medium => '64x64#',
+			  :large => '256x256#'
+			})
+
+		  protected
+			def decode_base64_image
+			  if image_data && content_type && original_filename
+				decoded_data = Base64.decode64(image_data)
+
+				data = StringIO.new(decoded_data)
+				data.class_eval do
+				  attr_accessor :content_type, :original_filename
+				end
+
+				data.content_type = content_type
+				data.original_filename = File.basename(original_filename)
+
+				self.image = data
+			  end
+			end
+		end
+	- getting closer
+	- http://madkingsmusings.blogspot.com/2011/03/crop-and-upload-image-server-side.html
+		StringIO.open(Base64.decode64(string)) do |data|
+		  data.original_filename = "photo.gif"
+		  data.content_type = "image/gif"
+		  model.photo = data
+		end	
+	- IT WORKS!
+	- can now save base64 into database
+	- aka picture for concept!
+	- fixed by using :image_data input instead of :image_url
+	- bug, broke computer and url upload
+	- fixed, base64 checker was wrong
+	- now i have to have the drawing save to db
+	- make it so it retrieves base64 image
+	- have it so it draws the current concept unto the canvas
+	- hmm back to work
+	- managed to make canvas to image work
+	- have to deal with how to auto save it to db
+	- have to deal with how to auto draw concept into canvas
+	- WORKKKKKKKKKKKKKKKS!
+	- had to ask question at stackoverflow
+	- had to use javascript to autofill the form
+	- made the text field hidden so we only see the button
+	- looks like saving the image directly
+
+	
+14) [FIXED]This is how to draw UML diagrams on RoR
+ http://railroad.rubyforge.org/#examples
+	- nvm it makes uml from the application
+	- not really any drawing stuff
+	
+15) [FIXED] DOESNT WORK ON CHROME
+	- found problem on application.js
+	- have something to do with adding event handlers
+	- example of code:
+		if(isIE())
+            elements[i].attachEvent("on"+event, func, bool);
+        else if(isFireFox())
+            elements[i].addEventListener(event, func, bool);
+	- Added isChrome function
+		function isChrome()
+			{
+				var i=navigator.userAgent.toLowerCase().indexOf("chrome");
+				return i>=0;
+			}
+	- Then did 		
+		if(isIE())
+            elements[i].attachEvent("on"+event, func, bool);
+        else if(isFireFox() || isChrome() ) //CHANGED THIS
+            elements[i].addEventListener(event, func, bool);
+			
+16) Adding how to draw FSD mind map
+	- hmm, Xmind
+	- tab = children
+	- enter/return = sibling
+	- delete = destroy
+	- how?
+	- hmmm found new, better one 
+	- jit
+	- not sure what to do yet
+	- example looks good
+	- application_helper.rb has the rightclick menu, all the js that handles creating/editing the
+		tree, might want to look at that
+	- look up projectEditWhenEnterPressed for creating new
+	

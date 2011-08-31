@@ -1,0 +1,11 @@
+<h2>Editing Function</h2>
+<%= errors_for(@function) %>
+<%= form_for(:function, :url => function_path(@function), :html => { :method => :put }) do |form| %>
+<fieldset>
+  <legend><%=h @function.name %></legend>
+  <%= render :partial => "form", :locals => { :form => form } %>
+  <%= submit_tag "Update", :class => "submit" %>
+  <button type="button" onclick="location.href='/projects/<%= session[:project_id] %>'" >Back</button>
+</fieldset>
+<% end %>
+

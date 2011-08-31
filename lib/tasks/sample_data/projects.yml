@@ -1,0 +1,8 @@
+Project1:
+  id: 1001
+  user_id: 1000
+  function_structure_diagram_id: 1000
+  name: Single Occupancy Vehicle
+  description: A project to design a new type of vehicle for single person.
+
+

@@ -1,0 +1,3 @@
+page.instant_create(@concept_category, "concept_category")
+
+

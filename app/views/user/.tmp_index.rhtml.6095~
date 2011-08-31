@@ -1,0 +1,7 @@
+<h1>
+	Welcome!
+	<% if @user=User.find(session[:user_id])%>
+		<%= @user.screen_name%>
+	<%end%>
+</h1>
+<p>This page will serve as the hub for users of Design Pad</p>

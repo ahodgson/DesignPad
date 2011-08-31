@@ -1,0 +1,10 @@
+page.visual_effect :shrink, "new_comment_form"
+page.insert_html  :top, "comments",
+                  :partial => "comments/comment",
+                  :locals=>{:comment=>@comment}
+                
+page.delay(1) do
+  page.show "add_comment_link"
+end
+
+page.visual_effect :highlight, "comment_#{@comment.id.to_s}", :duration => 2

@@ -1,0 +1,19 @@
+<% remote_form_for(:comment, :url => comments_path) do |form| %>
+
+<fieldset>
+  <legend>New Comment</legend>
+  <%= form.text_area :body, :rows => 2, :cols => 60, :onfocus=>"inputFocus=true;", :onblur=>"inputFocus=false;" %>
+  <%= hidden_field_tag hidden_tag, entity.id, :id=>nil%>
+  <br clear="all"/>
+  <%= submit_tag "Create" %>
+  <%= button_to_function "Cancel" do |page|
+        page.visual_effect :dropOut, "new_comment_form"
+        page.delay(1) do
+          page.show "add_comment_link"
+        end
+      end
+  %>
+</fieldset>
+<% end %>
+
+<%= draggable_element 'new_comment_form' %>

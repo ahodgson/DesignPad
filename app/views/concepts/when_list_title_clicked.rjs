@@ -1,0 +1,33 @@
+page<<"resetProjectEditPage()"
+
+page.refresh_available_objects(@function_structure_diagram, @entity_model_name)
+
+#index=@function_structure_diagram.available_known_objects.length-1
+#last_available_object_id=@function_structure_diagram.available_known_objects[index].id
+
+page.replace_html :known_objects_list_operations,
+                  link_to_function( "New",
+                                    " if(!$('instant_li')) new Insertion.Bottom($('available_known_objects_ul'), '<li id=\"instant_li\"></li>');
+                                      #{instant_new('instant_li','known_object', KnownObject::NAME_SIZE, KnownObject::NAME_MAX_LENGTH, {:concept_id=>@concept.id})};",
+                                    :class=>"pop_link")
+
+page.replace_html :project_view_legend, @concept.name
+
+# Show uploading link
+page.replace_html :project_view_operations,
+                  :partial=>'concepts/view_operation_bar',
+                  :locals=>{:concept=>@concept}
+                
+page.hide :uploading_form
+
+# Show diagram
+page.replace_html :project_view_content, image_for_concept(@concept, "concept")
+
+if @concept.avatar_file_name
+  page.replace_html :project_view_clue, link_to("(delete)", {:controller=>"concepts", :action=>"delete_picture", :id=>@concept.id}, :confirm=>'Are you sure to delete?')
+else
+  page.replace_html :project_view_clue, "No image found."
+end
+
+#load comments
+page.replace_html :comments_area, :partial=>"comments/comments", :locals=>{:concept=>@concept}

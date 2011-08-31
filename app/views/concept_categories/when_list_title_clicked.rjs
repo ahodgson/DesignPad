@@ -1,0 +1,8 @@
+page<<"resetProjectEditPage()"
+page.refresh_available_objects(@function_structure_diagram, @entity_model_name)
+
+page.replace_html :project_view_legend, @concept_category.name
+page.replace_html :project_view_content, :partial=>"concept_categories/concept_category_overview", :locals=>{:concept_category=>@concept_category}
+
+#page<<"clearOperationBar()"
+#page<<"clearViewClue()"

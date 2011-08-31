@@ -1,0 +1,7 @@
+# TODO Operate on the page object
+page<<"var textLength = document.getElementById('projectDescription').value.length;"
+page<<"if(textLength<#{Project::DESCRIPTION_MIN_LENGTH}||textLength>#{Project::DESCRIPTION_MAX_LENGTH})
+          $('errorMessageForProjectDescription').innerHTML='<i>length out of range(#{Project::DESCRIPTION_MIN_LENGTH}~#{Project::DESCRIPTION_MAX_LENGTH})</i>';
+       else
+          $('errorMessageForProjectDescription').innerHTML='';"
+

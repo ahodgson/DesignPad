@@ -1,0 +1,14 @@
+<h2>New Function</h2>
+
+<% if @function %>
+	<%= errors_for @function %>
+<% end %>
+
+<% form_for(:function, :url => functions_path ) do |form| %>
+<fieldset>
+  <legend>New Function</legend>
+  <%= render :partial => "form", :locals => { :form => form } %>
+  <%= submit_tag "Create", :class => "submit" %>
+  <button type="button" onclick="location.href='/projects/<%= session[:project_id] %>'" >Back</button>
+</fieldset>
+<% end %>

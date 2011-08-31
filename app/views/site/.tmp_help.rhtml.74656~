@@ -1,0 +1,533 @@
+<h1>Help</h1>
+<p>Under construction...</p>
+
+
+
+<!--for test-->
+    <body oncontextmenu = showMenu('')>
+
+        <form name = "menuForm">
+
+            <!--隐藏框，用来保存选择的菜单的id值-->
+
+            <input type = "hidden" name = "id" value = ""/>
+
+            <table>
+
+            <tr><td><a onclick = showMenu('0')>根目录</a></td></tr>
+
+            <tr><td><a href="javascript:clickMenu()"  oncontextmenu = showMenu('1')>菜单一</a></td></tr>
+
+            <tr><td><a href="javascript:clickMenu()"  oncontextmenu = showMenu('2')>菜单二</a></td></tr>
+
+            </table>
+
+        </form>
+
+    </body>
+
+
+
+    <!-- 这里用来定义需要显示的右键菜单 -->
+
+    <div id="itemMenu" style="display:none">
+
+           <table border="1" width="100%" height="100%" bgcolor="#cccccc" style="border:thin" cellspacing="0">
+
+                  <tr>
+
+                      <td style="cursor:default;border:outset 1;" align="center" onclick="parent.create()">
+
+                      新增
+
+                      </td>
+
+                  </tr>
+
+                  <tr>
+
+                      <td style="cursor:default;border:outset 1;" align="center" onclick="parent.update();">
+
+                      修改
+
+                      </td>
+
+                  </tr>
+
+                  <tr>
+
+                      <td style="cursor:default;border:outset 1;" align="center" onclick="parent.del()">
+
+                      删除
+
+                      </td>
+
+                  </tr>
+
+           </table>
+
+    </div>
+
+    <!-- 右键菜单结束-->
+
+</html>
+
+<script language="JavaScript">
+
+/**
+
+*根据传入的id显示右键菜单
+
+*/
+
+function showMenu(id)
+
+{
+
+    menuForm.id.value = id;
+
+    if("" == id)
+
+    {
+
+        popMenu(itemMenu,100,"100");
+
+    }
+
+    else
+
+    {
+
+        popMenu(itemMenu,100,"111");
+
+    }
+
+    event.returnValue=false;
+
+       event.cancelBubble=true;
+
+       return false;
+
+}
+
+/**
+
+*显示弹出菜单
+
+*menuDiv:右键菜单的内容
+
+*width:行显示的宽度
+
+*rowControlString:行控制字符串，0表示不显示，1表示显示，如“101”，则表示第1、3行显示，第2行不显示
+
+*/
+
+function popMenu(menuDiv,width,rowControlString)
+
+{
+
+    //创建弹出菜单
+
+    var pop=window.createPopup();
+
+    //设置弹出菜单的内容
+
+    pop.document.body.innerHTML=menuDiv.innerHTML;
+
+
+
+    var rowObjs=pop.document.body.all[0].rows;
+
+    //获得弹出菜单的行数
+
+    var rowCount=rowObjs.length;
+
+    //循环设置每行的属性
+
+    for(var i=0;i<rowObjs.length;i++)
+
+    {
+
+        //如果设置该行不显示，则行数减一
+
+        var hide=rowControlString.charAt(i)!='1';
+
+        if(hide){
+
+            rowCount--;
+
+        }
+
+        //设置是否显示该行
+
+        rowObjs[i].style.display=(hide)?"none":"";
+
+        //设置鼠标滑入该行时的效果
+
+        rowObjs[i].cells[0].onmouseover=function()
+
+        {
+
+            this.style.background="#818181";
+
+            this.style.color="white";
+
+        }
+
+        //设置鼠标滑出该行时的效果
+
+        rowObjs[i].cells[0].onmouseout=function(){
+
+            this.style.background="#cccccc";
+
+            this.style.color="black";
+
+        }
+
+    }
+
+    //屏蔽菜单的菜单
+
+    pop.document.oncontextmenu=function()
+
+    {
+
+            return false;
+
+    }
+
+    //选择右键菜单的一项后，菜单隐藏
+
+    pop.document.onclick=function()
+
+    {
+
+            pop.hide();
+
+    }
+
+    //显示菜单
+
+    pop.show(event.clientX-1,event.clientY,width,rowCount*25,document.body);
+
+    return true;
+
+}
+
+function create()
+
+{
+
+    alert("create" + menuForm.id.value + "!");
+
+}
+
+function update()
+
+{
+
+    alert("update" + menuForm.id.value + "!");
+
+}
+
+function del()
+
+{
+
+    alert("delete" + menuForm.id.value + "!");
+
+}
+
+function clickMenu()
+
+{
+
+    alert("you click a menu!");
+
+}
+
+</script>
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>www.52css.com</title>
+<style type="text/css">
+<!--
+
+#menu {
+  font-size:12px;
+  height:380px; 
+  margin:0;
+  padding:0;
+  width:180px;
+  overflow:hidden; 
+  background:#f0f0f0;
+  list-style:none;
+  border-left:1px solid #cccccc;
+  border-right:1px solid #cccccc;
+}
+#menu li a {
+  display:block;
+  text-decoration:none;
+  color:#00f;
+  margin:0;
+  width:100%;
+  }
+#menu li a span {
+  display:none; 
+  color:#666;
+  line-height:22px;
+  height:126px
+  display:block;
+  margin-top:12px;
+  }
+#menu li a.one span {
+  display:block;
+  margin:0 10px;
+}
+#menu li a:hover {
+  background:#f1f1f1;
+  }
+#menu li a:hover span {
+  display:block;
+  margin:0 10px;
+  cursor:pointer;
+}
+#menu .h2 {
+  margin:0 5px;
+  padding:0;
+  color:#00f;
+  font-variant:small-caps;
+  border:0;
+  }
+#menu .h3 {
+  margin:0 5px;
+  padding:0;
+  color:#06c;
+  }
+.curved {
+  width:180px;
+  margin:0 auto;
+  }
+.curved .b1, .curved .b2, .curved .b3, .curved .b4  {
+  font-size:1px;
+  display:block;
+  background:#88c;
+  overflow: hidden;
+  }
+.curved .b1, .curved .b2, .curved .b3 {
+  height:1px;
+}
+.curved .b2, .curved .b3, .curved .b4 {
+  background:#f0f0f0;
+  border-left:1px solid #cccccc;
+  border-right:1px solid #cccccc;
+  }
+.curved .b1 {
+  margin:0 4px;
+  background:#cccccc;
+  }
+.curved .b2 {
+  margin:0 2px;
+  border-width:0 2px;
+  }
+.curved .b3 {
+  margin:0 1px;
+  }
+.curved .b4 {
+  height:2px;
+  margin:0px;
+  }
+-->
+</style>
+</head>
+<body>
+
+<b class="b1 c1"></b>
+<b class="b2 c2"></b>
+<b class="b3 c3"></b>
+<b class="b4 c4" ></b>
+  <ul id="menu">
+    <li>
+     <a  href="http://www.52css.com/?309">
+      <b class="h2">我爱52CSS.com - 1</b> <span class='Cix568'>sflj www.it55.com kg^&fgd</span> <br />
+      <b class="h3">http://www.52css.com/</b>
+      <span>CSS模板 符合Web标准<br />CSS酷站 高手的实站经验<br />CSS Web Design<br /> CSS Templates<br />CSS WebSites</span>
+     </a>
+    </li>
+    <li>
+     <a href="http://www.52css.com/?309">
+      <b class="b1"></b>
+      <b class="b2"></b>
+      <b class="b3"></b>
+      <b class="b4"></b>
+      <b class="h2">我爱52CSS.com - 2</b><br />
+      <b class="h3">http://www.52css.com/</b>
+      <span>CSS模板 符合Web标准<br />CSS酷站 高手的实站经验<br />CSS Web Design<br /> CSS Templates<br />CSS WebSites</span>
+     </a>
+    </li>
+    <li>
+     <a href="http://www.52css.com/?309">
+      <b class="b1"></b>
+      <b class="b2"></b>
+      <b class="b3"></b>
+      <b class="b4"></b>
+      <b class="h2">我爱52CSS.com - 3</b><br />
+      <b class="h3">http://www.52css.com/</b>
+      <span>CSS模板 符合Web标准<br />CSS酷站 高手的实站经验<br />CSS Web Design<br /> CSS Templates<br />CSS WebSites</span>
+     </a>
+    </li>
+    <li>
+     <a href="http://www.52css.com/?309">
+      <b class="b1"></b>
+      <b class="b2"></b>
+      <b class="b3"></b>
+      <b class="b4"></b>
+      <b class="h2">我爱52CSS.com - 4</b> <span class='Cix568'>http://www.it55.com/</span> <br />
+      <b class="h3">http://www.52css.com/</b>
+      <span>CSS模板 符合Web标准<br />CSS酷站 高手的实站经验<br />CSS Web Design<br /> CSS Templates<br />CSS WebSites</span>
+     </a>
+    </li>
+    <li>
+     <a class="one" href="http://www.52css.com/?309">
+      <b class="b1"></b>
+      <b class="b2"></b>
+      <b class="b3"></b>
+      <b class="b4"></b>
+      <b class="h2">我爱52CSS.com - 5</b><br />
+      <b class="h3">http://www.52css.com/</b>
+      <span>CSS模板 符合Web标准<br />CSS酷站 高手的实站经验<br />CSS Web Design<br /> CSS Templates<br />CSS WebSites</span>
+     </a>
+   </li>
+ </ul>
+<b class="b4"></b>
+<b class="b3"></b>
+<b class="b2"></b>
+<b class="b1"></b>
+
+</body>
+</html>
+
+
+
+
+
+<script>
+startList = function()
+{
+  if (document.all&&document.getElementById)
+  {
+    navRoot = document.getElementById("nav");
+    for (i=0; i<navRoot.childNodes.length; i++)
+    {
+      node = navRoot.childNodes[ i ];
+      if (node.nodeName=="LI")
+      {
+        node.onmouseover=function(){this.className+=" over";}
+        node.onmouseout=function(){this.className=this.className.replace(" over", "");}
+      }
+    }
+  }
+}
+window.onload=startList;
+</script>
+<style>
+/*
+body {
+font: normal 11px verdana;
+}*/
+
+ul {
+margin: 0;
+padding: 0;
+list-style: none;
+width: 150px; 
+border-bottom: 1px solid #ccc;
+}
+
+ul li {
+position: relative;
+}
+
+li ul {
+position: absolute;
+left: 149px;
+top: 0px;
+display: none;
+}
+
+
+ul li a {
+display: block;
+text-decoration: none;
+color: #777;
+background: #fff; 
+padding: 5px;
+border: 1px solid #ccc;
+border-bottom: 0;
+}
+
+
+* html ul li { float: left; height: 1%; }
+* html ul li a { height: 1%; }
+
+
+ul li a:hover { color: #E2144A; background: #f9f9f9; } 
+
+li ul li a { padding: 2px 5px; } 
+
+li:hover ul, li.over ul { display: block; }  /* */
+</style>
+</head>
+<body>
+  <ul id="nav">
+    <li><a href="#">Home</a></li>
+    <li><a href="#">About</a>
+      <ul>
+        <li><a href="#">History</a></li>
+        <li><a href="#">Team</a></li>
+        <li><a href="#">Offices</a></li>
+      </ul>
+    </li>
+    <li><a href="#">Services</a>
+      <ul>
+        <li><a href="#">Web Design</a></li>
+        <li><a href="#">Internet Marketing</a></li>
+        <li><a href="#">Hosting</a></li>
+        <li><a href="#">Domain Names</a></li>
+        <li><a href="#">Broadband</a></li>
+      </ul>
+    </li>
+    <li><a href="#">Contact Us</a>
+      <ul>
+        <li><a href="#">United Kingdom</a></li>
+        <li><a href="#">France</a></li>
+        <li><a href="#">USA</a></li>
+        <li><a href="#">Australia</a></li>
+      </ul>
+    </li>
+  </ul>
+</body>
+
+
+<br />
+
+
+
+
+<SCRIPT FOR="window" EVENT="onload" LANGUAGE="JavaScript">
+  ;
+</SCRIPT>
+
+
+
+
+
+
+

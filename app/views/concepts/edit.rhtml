@@ -1,0 +1,58 @@
+<h1>Editing Concept</h1>
+
+<%= errors_for(@concept) %>
+Current Concept: <br><br/>
+<div id="project_view_content" clas="">	
+	<% if @concept.avatar_file_name %>
+		<%= image_tag(@concept.avatar.url, :id =>"concept_image") %>
+	<% else %>
+		<%= image_tag("/images/none.jpg", :id =>"concept_image") %>
+	<% end %>
+</div>
+
+<div id="edit_concept_bottom_links">
+	<input type="button" id="upload" value="Upload">
+	<input type="button" id="editcanvas" value="Edit">
+</div>
+
+<div id="edit_concept_upload" style="display:none;">
+	<% form_for(@concept, :url=>{:controller=>"concepts", :action=>"update"}, :html => { :multipart => true }) do |f| %>
+		<p>
+			<h1></i>Upload New</i><Br></h1>
+			From Computer:
+			<%= f.file_field :avatar %><br><Br>
+			From URL: <%= f.text_field :image_url %><br><br>
+			<%= submit_tag "Save Concept" %>
+		</p>
+	<% end %>
+	<input type="button" id="hideupload" value="Hide Form">
+</div>
+<br><br>
+<div id="edit_concept_canvas" style="display:none;">
+	<canvas width="420" height="450" style="border:1px solid black;" id="thecanvas"></canvas>
+
+	
+	<div id="buttoncontainer" style="display:block;">
+		<input type="button" id="convertpngbtn" value="Save Concept">
+		<br/>
+	</div>
+	<br/><br/>
+	<div id="textdownload" style="display:none;font-style:italic;">
+		<% form_for(@concept, :url=>{:controller=>"concepts", :action=>"update"}, :html => { :id => "save_image_from_canvas", :multipart => true }) do |f| %>
+		<p>
+			<%= f.hidden_field :image_data %>
+			<%= submit_tag "Save Concept", :id=>"auto_save"%>
+		</p>
+	<% end %>
+		<input type="button" id="resetbtn" value="Reset">
+	</div>
+	<%= button_to "Remove", {:controllers=> 'concepts', :action => 'delete_avatar', :id => @concept.id},
+          :confirm => "Are you sure?" %>
+	<input type="button" id="hidecanvas" value="Hide Canvas">
+</div>
+
+
+<script type="text/javascript" src="/javascripts/base64.js"></script>
+<script type="text/javascript" src="/javascripts/canvas2image.js"></script>
+<script type="text/javascript" src="/javascripts/editConcept.js"></script>
+

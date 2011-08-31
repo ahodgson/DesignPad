@@ -1,0 +1,28 @@
+KTang:
+  id: 1000
+  team_id: 1001
+  screen_name: kexia
+  email: laputasl@hotmail.com
+  password: 1111
+BAmes:
+  id: 1001
+  team_id: 1001
+  screen_name: name
+  email: bruce_ames@example.com
+  password: 1111
+JAndelin:
+  id: 1002
+  team_id: 1002
+  screen_name: name1
+  email: john_andelin@example.com
+  password: 1111
+MArens:
+  id: 1003
+  team_id: 1002
+  screen_name: name2
+  email: moshe_arens@example.com
+  password: 1111
+
+
+
+

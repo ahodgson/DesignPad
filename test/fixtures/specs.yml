@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+valid_spec:
+  id: 1
+  user_id: 1
+  first_name: Kip
+  last_name: Thorne
+  gender: Male
+  birthdate: 1940-06-01
+  student_number: 56214075
+
+blank_spec:
+  id: 2
+  user_id: 2

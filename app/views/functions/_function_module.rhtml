@@ -1,0 +1,17 @@
+<% if function_structure_diagram.functions.length==0 %>
+	<b>No Function is Created.</b>
+<% else %>
+  <% function_structure_diagram.functions.each do |function| %>
+    <div id='<%= function.id.to_s %>_function_module' class='function_module' ><%=h function.name %></div>
+
+    <%= javascript_tag "jQuery('##{function.id.to_s}_function_module').draggable({containment: 'parent'});
+      jQuery('##{function.id.to_s}_function_module').dblclick(function(){
+
+        //jQuery(this).effect('transfer', { to: jQuery('#project_view_content')}, 1000);
+
+        click($('#{function.id.to_s}_function_list_title'));
+
+      })"%>
+
+  <% end %>
+<% end %>

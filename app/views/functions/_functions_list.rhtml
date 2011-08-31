@@ -1,0 +1,16 @@
+<div id="functions_list" class="itemList">
+  <fieldset>
+    <legend>Functions</legend>
+	
+    <%= collection_select(:function, :id, functions, :id, :name, {}, :multiple=>true ) %>
+    <div class="opLinks">
+      <%= link_to "New ", new_function_path%>|
+      <%= link_to "Edit ", "javascript: editFunction()"%>|
+      <%= link_to_remote "Delete ", :url=>{:controller=>"functions", :action=>"destroy_multiple"},
+                                    :with=>"'selected_ids='+selectedIds('function_id')
+                                           +'&function_structure_diagram_id='+#{function_structure_diagram_id}",
+                                    :confirm=>"Are you sure?"
+                                    %>
+    </div>
+  </fieldset>
+</div>

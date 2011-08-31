@@ -1,0 +1,11 @@
+page<<"resetProjectEditPage()"
+
+page.refresh_available_objects(@function_structure_diagram, @entity_model_name)
+
+page.replace_html :project_view_legend, @function.name
+page.replace_html :project_view_content, ""
+page.insert_html :bottom, :project_view_content, :partial=>"functions/description", :locals=>{:function=>@function}
+page.insert_html :bottom, :project_view_content, :partial=>"functions/short_form", :locals=>{:function=>@function, :known_objects=>@known_objects }
+page.replace_html :project_view_operations, link_to_function("Back to Function Structure Diagram", "click($('#{@function.function_structure_diagram.id.to_s}_function_structure_diagram_list_title'))")
+
+#page<<"clearViewClue()"

@@ -1,0 +1,275 @@
+body {
+  font-family:sans-serif;
+  background: gray;
+  margin: 0;
+  text-align: center;
+}
+#container {
+    position: relative;
+	background-color="#fff"
+}
+#imageView {
+    border: 1px solid #000000;
+	background-color:#fff;
+}
+#imageTemp {
+    left: 1px;
+    position: absolute;
+    top: 1px;
+}
+#whole_page {
+  width: 50em;
+  margin: auto;
+  padding: 0;
+  text-align: left;
+  border-width:  0 1px 1px 1px;
+  border-color:  black;
+  border-style:  solid;
+}
+
+#header {
+  color: white;
+  background: navy; /* No "ruby" defined in HTML color names! */
+  font-size: 24pt;
+  padding: 0.25em;
+  margin-bottom: 0;
+}
+
+#nav {
+  color: black;
+  font-size: 12pt;
+  font-weight: bold;
+  background: #ccc;
+  padding: 0.5em;
+}
+
+#nav a, #nav a:visited  {
+  color: navy;
+  text-decoration: none;
+}
+
+#nav a:hover {
+  border-bottom: 2px dotted navy;
+}
+
+#content {
+  height: 100%;
+  background: #eee;
+  padding: 1em;
+}
+
+#content h1 {
+  font-size: 18pt;
+}
+
+/* Hack to get IE to display fieldset/legend correctly */
+.non_firefox fieldset {
+  position: relative;
+}
+
+.non_firefox legend {
+  position:absolute;
+  top: -1em;
+  left: .5em;
+}
+
+.non_firefox fieldset {
+  position: relative;
+  margin-top:1em;
+  padding-top:2em;
+  padding-bottom: 2em;
+}
+
+/* Form Styles */
+fieldset {
+  -moz-border-radius:10px;
+  background: #ddd;
+}
+
+legend {
+  -moz-border-radius:10px;
+  font-weight:bold;
+  color: white;
+  background: navy;
+  padding: .4em 1em;
+}
+
+label {
+  width: 10em;
+  float: left;
+  text-align: right;
+  margin-right: 0.2em;
+  display: block;
+}
+
+div {
+    /* -moz-border-radius: 5px; */
+}
+
+.form_row {
+  white-space: nowrap;
+  padding-bottom: .5em;
+}
+
+.submit {
+  margin-left: 12.2em;
+}
+
+/* Debug Style */
+
+#debug {
+  margin-top: 1em;
+  margin-left: auto;
+}
+#debug a, #debug a.visited {
+  text-decoration: none;
+  color: navy;
+}
+fieldset.debug_info {
+  text-align: left;
+  margin: 1em;
+  background: #eee;
+}
+
+/* Error Reporting Styles */
+.fieldWithErrors {
+  margin: 2px;
+  padding: 2px;
+  background-color: red;
+  display: table;
+}
+
+#errorExplanation {
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#errorExplanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12pt;
+  margin: -7px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#errorExplanation p {
+  color: #333;
+  margin-bottom: 0;
+  padding: 5px;
+}
+
+#errorExplanation ul li {
+  font-size: 11pt;
+  list-style: square;
+}
+
+/* Flash Notice Style */
+#notice {
+  border: 1px solid green;
+  padding: 1em;
+  margin: 1em;
+  margin-bottom: 2em;
+  background-color: lightgray;
+  font: bold smaller sans-serif;
+}
+
+
+
+
+
+/*----for design menu-------*/
+
+/* Table List Styles */
+
+a, a#visited {
+  color: navy;
+  text-decoration: none;
+}
+
+.link, .link_current {
+/*  width: 3em;*/
+  text-align: center;
+  border: 1px solid gray;
+  background: #fff;
+  padding: 5px 2px 1px 2px;
+  float: left;
+  margin: 2px
+}
+
+.link:hover {
+  background: #fe4;
+}
+
+.link_current {
+  background: #fe4;
+  font-weight: bold;
+  border: 1px solid black;
+}
+
+table.list {
+  float:left;
+  background: #fff;
+  margin-left: 0em;
+  margin-bottom: 1em;
+}
+
+table.list td.bottom {
+  border-top: 1px solid #999;
+  padding-top: 10px;
+}
+
+table.list th {
+  color: white;
+  background: navy;
+  font-weight: normal;
+}
+
+table.list th a {
+  color: white;
+  text-decoration: underline;
+}
+
+table.list tr.even {
+  background: #ddd;
+}
+
+table.list tr.odd {
+  background: #eee;
+}
+
+/*Funcion Structure Diagram style*/
+
+#description {
+    margin-top: 2em;
+}
+.description{
+    margin-left: 2em;
+}
+.diagram{
+    background-color:gray;
+    width:30em;
+    height:18em;
+    margin-left:240px;
+    border-width: 1px 1px 1px 1px;
+    border-color: black;
+    border-style: solid;
+    padding:10pt;
+}
+/*----end for design menu-------*/
+
+
+
+
+ul li a:hover {
+    color: #E2144A; background: #f9f9f9;
+}
+
+
+
+
+

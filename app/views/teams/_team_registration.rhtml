@@ -1,0 +1,18 @@
+<div id="team_registration" class="sidebar_box">
+    <h2>
+      <span class="header">Team Registration</span>
+      <span class="edit_link"><%= link_to "(new)", :before=>"", :url=>new_team_path, :method=>:get, :remote => true %></span>
+      <br clear="all" />
+    </h2>
+    <div class="sidebar_box_contents">
+      <% if teams.length<=0 %>
+        <%= link_to "Create the first team!", "/teams/new", :method=>:get, :remote => true %>
+      <% else %>
+        <% form_for :user, :url=>{:controller=>"user", :action=>"edit"} do |form| %>
+          <%= hidden_field_tag "attribute", "team_id", :id=>nil%>
+          <%= collection_select(:user, :team_id, teams, :id, :name ) %>
+          <%= submit_tag "Register" %>
+        <% end %>
+      <% end %>     
+    </div>
+</div>

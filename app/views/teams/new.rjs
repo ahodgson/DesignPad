@@ -1,0 +1,4 @@
+page.replace_html "newTeam", :partial=>"teams/new"
+page.hide "newTeam"
+page.visual_effect :blind_down, "newTeam"
+page.draggable "newTeam"

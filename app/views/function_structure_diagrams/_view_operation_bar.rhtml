@@ -1,0 +1,13 @@
+<span id="uploading_form">
+  <%= form_for :function_structure_diagram,
+              :url=>{:controller=>"function_structure_diagrams", :action=>"update", :id=>function_structure_diagram.id},
+              :html=>{:method=>"put", :id=>"upload_form", :multipart=>true} do |form| %>
+    <%= form.file_field "diagram", :id=>"upload_field"%>
+    <%= link_to_function "Upload!", "if($('upload_field').value.length>0) $('upload_form').submit(); else alert('please select a file first.')"%> |
+    <%= link_to_function "Cancel", "$('uploading_link').style.display=''; $('uploading_form').style.display='none';"%>
+  <% end %>
+</span>
+
+<span id="uploading_link">
+<%= link_to_function "Upload Image", "$('uploading_link').style.display='none'; $('uploading_form').style.display='';"%>
+</span>

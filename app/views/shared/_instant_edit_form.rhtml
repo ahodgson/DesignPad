@@ -1,0 +1,22 @@
+<span id="instant_edit_form">
+  <%= remote_form_for entity_model_name.to_sym,  :url=>{ :controller=>entity_model_name.pluralize,
+                                                        :action=>:update,
+                                                        :id=>entity.id},
+                                                :method=>:put,
+                                                :before=>"if($(instant_textfield).value.length<=0)return false;
+                                                          if(instantInputFlag==false) return false; instantInputFlag=false;" do |form| %>
+
+    <%= form.text_field :name,
+                        :id=>"instant_textfield",
+                        :size=>size,
+                        :value=>entity.name,
+                        :maxlength=>maxlength %>
+  
+    <% hidden_fields.each do |key, value| %>
+      <%= hidden_field_tag key, value %>
+    <% end %>
+
+  <% end %>
+
+  <%= javascript_tag "$('instant_textfield').select(); $('instant_textfield').focus();" %>
+</span>

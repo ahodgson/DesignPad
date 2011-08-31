@@ -1,0 +1,81 @@
+    <% available_known_objects=function_structure_diagram.available_known_objects %>
+
+    <% if known_object.is_project_object? %>
+      <li class="project_known_object_li" id="<%= known_object.id.to_s %>_known_object_li">
+        <span class="project_known_object_list_title list_title" id="<%= known_object.id.to_s %>_known_object_list_title">
+          <%= known_object.name %>
+        </span>
+    <% elsif available_known_objects.include?(known_object)%>
+      <li class="concept_known_object_li" id="<%= known_object.id.to_s %>_known_object_li">
+        <span class="concept_known_object_list_title list_title" id="<%= known_object.id.to_s %>_known_object_list_title">
+          <%= known_object.name %>
+        </span>
+    <% else %>
+      <li class="unavailable_known_object_li" id="<%= known_object.id.to_s %>_known_object_li">
+        <span class="unavailable_known_object_list_title list_title" id="<%= known_object.id.to_s %>_known_object_list_title">
+          <%= known_object.name %>
+        </span>
+    <% end %>
+
+
+    <% function_structure_diagrams=known_object.function_structure_diagrams %>
+
+    <% if function_structure_diagrams.length>1 %>
+      <%= javascript_tag "addClass('known_object_shared', $('#{known_object.id.to_s}_known_object_list_title'))" %>
+    <% end %>
+
+    <% if entity_model_name=='concept' %>
+      <% concept=function_structure_diagram.concept %>
+      <% if function_structure_diagrams.include?(concept.function_structure_diagram) %>
+        <%= javascript_tag "addClass('known_object_in_use', $('#{known_object.id.to_s}_known_object_list_title'))" %>
+      <% end %>
+    <% end %>
+
+
+    <%= javascript_tag "synergies['#{known_object.id.to_s}']=[]; //hash table" %>
+
+    <% function_structure_diagrams.each do |fsd|%>
+      <% if not fsd.is_for_project? %>
+        <%= javascript_tag "synergies['#{known_object.id.to_s}'].push(#{fsd.concept.id.to_s});" %>
+      <% end %>
+    <% end %>
+
+    <%= javascript_tag "$('#{known_object.id.to_s}_known_object_list_title').onmouseover=
+      function(){
+        cancelHighlightedSynergy();
+        highlightSynergy(synergies['#{known_object.id.to_s}']);
+      }" %>
+
+    <%= javascript_tag "$('#{known_object.id.to_s}_known_object_list_title').onmouseout=
+      function(){
+        cancelHighlightedSynergy();
+        var selectedObject=getSelectedObject();
+        if(selectedObject)
+        {
+            highlightSynergy(synergies[selectedObject.id.split('_').first()]);
+        }
+      }" %>
+
+    <%= javascript_tag "$('#{known_object.id.to_s}_known_object_list_title').onclick=
+      function(){
+        makeUniqueClass('selected_object', this);
+        highlightSynergy(synergies['#{known_object.id.to_s}']);
+      }" %>
+
+
+    <%= javascript_tag "$('#{known_object.id.to_s}_known_object_list_title').oncontextmenu=
+      function(event){
+
+        var evt=getUnifiedEvent(event);
+
+        if(!isOfClass('selected_object', this))
+          click(this);
+
+        #{object_pop_menu(known_object, KnownObject::NAME_SIZE, KnownObject::NAME_MAX_LENGTH, {:function_structure_diagram_id=>function_structure_diagram.id, :entity_model_name=>entity_model_name})}
+        showContextMenu(this, evt, $('object_pop_menu'));
+
+        //disable default firefox menu
+        return false;
+      }" %>
+
+    </li>

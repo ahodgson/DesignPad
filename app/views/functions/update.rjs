@@ -1,0 +1,20 @@
+
+  if @attribute=='description'
+    page.replace_html :function_description, :partial=>"functions/description", :locals=>{:function=>@function}
+    page<<"$('function_description_clue').innerHTML='update successful'"
+    page.delay(3) do
+      page.replace_html :function_description_clue, ""
+    end
+  elsif @attribute=='short_form'
+    page.replace_html :function_short_form, :partial=>"functions/short_form", :locals=>{:function=>@function, :known_objects=>@known_objects}
+    page<<"$('function_short_form_clue').innerHTML='update successful'"
+    page.delay(3) do
+      page.replace_html :function_short_form_clue, ""
+    end
+  elsif @attribute=='list_title'
+    page.instant_update(@function, "function")
+  else
+    pare.alert("an error occured")
+  end
+
+

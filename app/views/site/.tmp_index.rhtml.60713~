@@ -1,0 +1,127 @@
+<h1>Welcome!</h1>
+<p>This is an online guiding software for product design.</p>
+
+
+
+
+<!--for test-->
+<hr/>
+
+<div id="drag" class="green box">drag</div>
+<%= draggable_element :drag, :revert => true %>
+
+<div id="drop" class="pink box">drop</div>
+<%= drop_receiving_element :drop, :hoverclass => "hover",
+     :update => "status", :url => { :action => "receive_drop" } %>
+
+<div id="status"></div>
+
+<hr/>
+
+<div id="dragDIV" class="green box">drag</div>
+<%= javascript_tag "new Draggable('dragDIV')" %>
+
+<hr/>
+
+<div id="helperDIV" class="green box" style="cursor:move; float:left">helper</div>
+  <%= draggable_element :helperDIV %><br/>
+  
+<hr/>
+
+  <div id="clickDIV" class="green box">
+      <%= button_to_function "Make draggable", draggable_element_js(:a)%>
+  </div>  
+  <div id="a">click the button first</div>
+  
+ <hr/> 
+ 
+  <div id="revertDIV" class="green box">revert</div>
+  <%= draggable_element :revertDIV, :revert => true %> 
+  
+<hr/>
+
+  <div id="functionRevertDIV" class="green box">function revert</div>
+  <%= draggable_element :functionRevertDIV, 
+       :revert => "function(el){
+          return Position.page(el)[0] > 100; }" %>
+		  
+<hr/>
+
+<div id="ghostingDIV" class="green box">ghosting</div>
+  <%= draggable_element :ghostingDIV, :ghosting => true %> 
+  
+<hr/>
+
+  <div id="handleDIV" class="green box">
+    handleDIV
+  </div><span id="myHandle">handle</span>
+  <%= draggable_element :handleDIV, :handle => "'myHandle'" %> 
+
+<hr/>
+  
+  <div id="changeDIV" class="green box">change</div>
+  <%= draggable_element :changeDIV, :change => "function(draggable) {
+    draggable.element.innerHTML=draggable. currentDelta();
+  }" %> 
+
+<hr/>
+  
+  <div id="constraintDIV" class="green box">constraint</div>
+  <%= draggable_element :constraintDIV, :constraint => 'vertical' %> 
+
+<hr/>
+  
+  <div id="snapDIV_50" class="green box">snap to 50</div>
+  <%= draggable_element :snapDIV_50, :snap => 50 %> 
+
+<hr/>
+
+  <div id="snapDIV_50_100" class="green box">snap to 50,100</div>
+  <%= draggable_element :snapDIV_50_100, :snap => '[50,100]' %> 
+  
+<hr/>
+
+  <div id="snapDIV_function" class="green box">snap to function</div> 
+  <%= draggable_element :snapDIV_function, :snap => "function(x, y) {
+    new_x = (x > 100) ? 100 : ((x < 0) ? 0 : x);
+    new_y = (y > 100) ? 100 : ((y < 0) ? 0 : y);
+    return [ new_x, new_y ]; 
+  }" %> 
+
+<hr/>
+
+<div id="dropDIV" class="pink box">drop</div>
+  <%= javascript_tag "Droppables.add('dropDIV', {hoverclass:'hover'})" %> 
+
+<hr/>
+
+<div id="dropHelperDIV" class="pink box">drop here.</div>
+  <%= drop_receiving_element :dropHelperDIV, :hoverclass => 'hover' %> 
+
+<hr/>
+
+<div id="one">
+    <div id="dragGreen2" class="green box">drag</div>
+    <%= draggable_element :dragGreen2, :revert => true %>
+</div>
+
+<div id="two">
+    <div id="dragPink2" class="pink box">drag</div>
+    <%= draggable_element :dragPink2, :revert => true %>
+</div>
+
+<div id="dropContainment" class="pink box">drop here.</div>
+<%= drop_receiving_element :dropContainment, :hoverclass => "hoverDeleteIcon",
+    :containment => "'one'" %>
+<!--
+<script type="text/javascript">
+var x = prompt("Enter a number between 0 and 10:","")
+try {
+if(x>10) throw "Err1"
+else if(x<0) throw "Err2"
+} catch(er) {
+if(er=="Err1") alert("Error! The value is too high")
+else if(er == "Err2") alert("Error! The value is too low")
+}
+</script>
+-->

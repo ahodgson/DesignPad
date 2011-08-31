@@ -1,0 +1,24 @@
+<div id="function_short_form">
+  <%= form_for(:function, :url => function_path(function), :html => { :method => :put }, :remote => true) do |form| %>
+    <fieldset>
+      <legend>Primary Relationship</legend>
+
+      <div class="form_row">
+        <label for="known_objects1">Object1:</label>
+        <%= collection_select(:function, :object1_id, known_objects, :id, :name) %>
+      </div>
+
+      <div class="form_row">
+        <label for="known_objects2">Object2:</label>
+        <%= collection_select(:function, :object2_id, known_objects, :id, :name) %>
+      </div>
+
+      <%= text_field_for form, "relation", Function::RELATION_SIZE, Function::RELATION_MAX_LENGTH %>
+
+      <%= hidden_field_tag "attribute", "short_form", :id=>nil%>
+      <%= submit_tag "Update", :class=>"submit" %>
+      <span id="function_short_form_clue"></span>
+
+    </fieldset>
+  <% end %>
+</div>

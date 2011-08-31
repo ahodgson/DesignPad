@@ -1,0 +1,2 @@
+page.visual_destroy("#{@function.id}_function_li", "#{@function.function_structure_diagram.id}_function_structure_diagram_list_title")
+

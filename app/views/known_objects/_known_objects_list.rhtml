@@ -1,0 +1,14 @@
+<div id="known_objects_list" class="itemList">
+  <fieldset>
+    <legend>Known Objects</legend>
+    <%= collection_select(:known_object, :id, known_objects, :id, :name, {}, :multiple=>true) %>
+    <div class="opLinks">
+      <%= link_to "New ", new_known_object_path %>|
+      <%= link_to "Edit ", "javascript: editKnownObject()" %>|
+      <%= link_to_remote "Delete ", :url=>{:controller=>"known_objects", :action=>"destroy_multiple"},
+                                    :with=>"'selected_ids='+selectedIds('known_object_id')
+                                           +'&function_structure_diagram_id='+#{function_structure_diagram_id}",
+                                    :confirm=>"Are you sure?" %>
+    </div>
+  </fieldset>
+</div>

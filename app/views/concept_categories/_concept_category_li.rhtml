@@ -1,0 +1,87 @@
+<li class='concept_category_li' id='<%= concept_category.id.to_s %>_concept_category_li'>
+  <span class='expansion_mark' id='<%= concept_category.id.to_s %>_concept_category_expansion_mark'></span>
+  <span class='concept_category_icon icon' id='<%= concept_category.id.to_s %>_concept_category_icon'><img src='<%= ConceptCategory::ICON_PATH %>' /></span>
+  <span class='concept_category_list_title list_title' id='<%= concept_category.id.to_s %>_concept_category_list_title'><%= concept_category.name %></span>
+  <a style="display:none"><%= concept_category.name %></a>
+  <%= render :partial=>"concept_categories/concept_category_ul", :locals=>{:concept_category=>concept_category} %>
+
+
+  <%#= drop_receiving_element concept_category.id.to_s+'_concept_category_li',
+                                      :hoverclass => "hoverConceptCategory",
+                                      :accept=>"concept_list_title",
+                                      #:containment=>"",
+                                      #:before=>"if(!confirm('Are you sure to move?')) return false;",
+                                      #:complete=>"",
+                                      :with=>"'element_to_move_id='+element.parentNode.id
+                                              +'&post_concept_category_id='+#{concept_category.id.to_s}",
+                                      :url=>{:controller=>:concept_categories, :action => "receive_concept"}
+                                      %>
+
+  <%= javascript_tag "jQuery('##{concept_category.id.to_s}_concept_category_li').droppable({
+                                      hoverClass: 'hoverConceptCategory',
+                                      accept: '.concept_list_title',
+                                      greedy: true,
+                                      containment: 'project_tree_content',
+
+                                      drop:function(event, ui)
+                                        {
+                                            //******if ghosting is set to be true
+                                            //jQuery('#'+ui.draggable.attr('id')).draggable('option', 'revert', false);
+                                            //jQuery('#'+ui.draggable.attr('id')).hide();
+
+                                            new Ajax.Request('/concept_categories/receive_concept',
+                                                              {
+                                                                  asynchronous: true,
+                                                                  evalScripts: true,
+                                                                  parameters: 'element_to_move_id='+ui.draggable.get(0).parentNode.id
+                                                                              +'&post_concept_category_id='+#{concept_category.id.to_s}
+                                                              })
+                                        }
+                                      })"%>
+
+  <%= javascript_tag "addEventById('#{concept_category.id.to_s}_concept_category_list_title', 'click',
+    function(){
+      makeUniqueClass('selected_list_title', $('#{concept_category.id.to_s}_concept_category_list_title'));
+      resetProjectEditPage();
+
+      // global variables to facilitate onKeyUp()
+      sibSize=#{ConceptCategory::NAME_SIZE};
+      sibMaxLength=#{ConceptCategory::NAME_MAX_LENGTH};
+      sibDefaultText='New Concept Category';
+      sibModel='concept_category';
+      sibSubmitUrl='#{url_for(:controller=>"concept_categories", :action=>"create")}'
+      superIdName='function_id'
+      superIdValue=#{concept_category.function.id}
+
+      subSize=#{Concept::NAME_SIZE};
+      subMaxLength=#{Concept::NAME_MAX_LENGTH};
+      subDefaultText='New Concept';
+      subModel='concept';
+      subSubmitUrl='#{url_for(:controller=>"concepts", :action=>"create")}'
+      selfIdName='concept_category_id'
+      selfIdValue=#{concept_category.id}
+
+      #{remote_function(:url=>{:controller => 'concept_categories', :action=>'when_list_title_clicked', :concept_category_id=>concept_category.id})}
+    },
+    false);" %>
+
+  <%= javascript_tag "$('#{concept_category.id.to_s}_concept_category_list_title').onmouseover=function(){removeHover()};" %>
+
+  <%= javascript_tag "$('#{concept_category.id.to_s}_concept_category_list_title').oncontextmenu=
+    function(event){
+
+      var evt=getUnifiedEvent(event);
+
+      if(!isOfClass('selected_list_title', this))
+        click(this);
+      else
+        projectEditOnClick(evt);
+
+      #{pop_menu('concept_category', concept_category, ConceptCategory::NAME_SIZE, ConceptCategory::NAME_MAX_LENGTH)}
+      showContextMenu(this, evt, $('pop_menu'));
+
+      //disable default firefox menu
+      return false;
+    }" %>
+</li>
+

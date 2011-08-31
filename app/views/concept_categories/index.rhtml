@@ -1,0 +1,18 @@
+<h1>Listing concept_categories</h1>
+
+<table>
+  <tr>
+  </tr>
+  
+<% for concept_category in @concept_categories %>
+  <tr>
+    <td><%= link_to 'Show', concept_category_path(concept_category) %></td>
+    <td><%= link_to 'Edit', edit_concept_category_path(concept_category) %></td>
+    <td><%= link_to 'Destroy', concept_category_path(concept_category), :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New concept_category', new_concept_category_path %>

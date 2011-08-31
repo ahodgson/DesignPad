@@ -1,0 +1,13 @@
+team1:
+  id: 1001
+  #user_id: 1000
+  name: team1
+team2:
+  id: 1002
+  #user_id: 1001
+  name: team2
+team3:
+  id: 1003
+  #user_id: 1002
+  name: team3
+  

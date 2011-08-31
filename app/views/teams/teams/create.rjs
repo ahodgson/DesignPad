@@ -1,0 +1,9 @@
+page.visual_effect :shrink, "newTeam"
+page.replace :basic_information, :partial=>"user/basic_information"
+page.replace :team_registration, :partial=>"projects/projects_list", :locals=>{:projects=>@projects}
+
+page.visual_effect :highlight, :team_name_tr
+page.visual_effect :pulsate, :team_name_tr
+page.visual_effect :highlight, :projects_list
+page.visual_effect :pulsate, :projects_list
+

@@ -1,0 +1,32 @@
+category01:
+  id: 1000
+  function_id: 1001
+  name: Unclassified
+category02:
+  id: 2000
+  function_id: 1002
+  name: Unclassified
+category03:
+  id: 3000
+  function_id: 1003
+  name: Unclassified
+category1:
+  id: 1001
+  function_id: 1001
+  name: category1
+  description: first category
+category2:
+  id: 1002
+  function_id: 1001
+  name: category2
+  description: second category
+category3:
+  id: 1003
+  function_id: 1001
+  name: category3
+  description: third category
+category4:
+  id: 1004
+  function_id: 1001
+  name: category4
+  description: fourth category

@@ -1,0 +1,20 @@
+<div id="projects_list" class="sidebar_box">
+    <h2>
+      <span class="header">Projects List</span>
+      <span class="edit_link"><%= link_to "(new)", new_project_path, :remote => true %></span>
+      <br clear="all" />
+    </h2>
+    <div class="sidebar_box_contents">
+      <% if projects.length==0 %>
+        <div id="create_first_project">
+          <%= link_to "Create the First Project!", new_project_path, :remote => true %>
+        </div>
+      <% else %>
+        <ul id="projectList">
+          <% projects.each do |project| %>
+            <li id="project_<%= project.id.to_s %>"><%= link_to project.name, project_path(project.id) %></li>
+          <%end%>
+        </ul>
+      <% end %>
+    </div>
+</div>

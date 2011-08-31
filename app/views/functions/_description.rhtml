@@ -1,0 +1,23 @@
+<div id="function_description">
+  
+  <%= form_for(:function, :url => function_path(function), :html => { :method => :put }, :remote => true) do |form| %>
+    <fieldset>
+      <legend>Description</legend>
+
+      <div class="form_row">
+        <label for="name">Function:</label>
+        <%= form.text_field :name, :size=>Function::NAME_SIZE, :maxlength=>Function::NAME_MAX_LENGTH %>
+      </div>
+
+      <div class="form_row">
+        <label for="description">Extended Definition:</label>
+        <%= form.text_area :description, :rows => 1, :cols => 23, :rows => 2 %>
+      </div>
+
+      <%= hidden_field_tag "attribute", "description", :id=>nil%>
+      <%= submit_tag "Update", :class=>"submit" %>
+      <span id="function_description_clue"></span>
+
+    </fieldset>
+  <% end %>
+</div>

@@ -1,0 +1,43 @@
+<style type="text/css">
+  #whole_page {
+    width: 70em;
+  }
+</style>
+
+<span class="project_name"><h2>Project: <%= link_to @title, edit_project_path(@project) %></h2></span>
+
+<span class="project_delete_link">
+  <% if @project.user==@user %>
+    <b><%= link_to "(delete)", project_path(@project), :method=>:delete, :confirm=>"Are you sure to delete this project?" %></b>
+  <% end %>
+</span>
+
+<br clear="all" />
+<dl>
+  <dt>Description:</dt>
+  <dd><%= @project.description %></dd>
+</dl>
+
+<hr/>
+
+<div id="projet_show_left_column">
+  <%= render :partial=>"known_objects/known_objects_list", :locals=>{:known_objects=>@known_objects, :function_structure_diagram_id=>@function_structure_diagram.id} %>
+  <%= render :partial=>"functions/functions_list", :locals=>{:functions=>@functions, :function_structure_diagram_id=>@function_structure_diagram.id} %>
+  
+  <div id="new_known_object"></div>
+  <div id="edit_known_object"></div>
+  <div id="new_function"></div>
+  <div id="edit_function"></div>
+</div>
+
+<div id="project_view_area">
+  <fieldset>
+    <legend>Function Structure Diagram</legend>
+    <div id="project_view_content">
+      <%= image_for(@function_structure_diagram, "function_structure_diagram") %>
+    </div>        
+  </fieldset>
+</div>
+
+<br clear="all"/>
+<%= link_to 'Back', :controller=>"projects", :action=>"index" %>

@@ -1,0 +1,31 @@
+<!-- To improve efficiency, also can pass model validation variables (lengths)
+to this partial so that the validation can be performed locally without ajax to
+call the server (remote_function)-->
+
+<% form_for(:project, :url=>projects_path, :remote => true ) do |form| %>
+<fieldset>
+  <legend>New Project</legend>
+
+  <div class="form_row">
+    Name:<span id="errorMessageForProjectName"></span><br/>
+    <%= form.text_field :name,
+                        :id=>"projectName",
+                        :size=>Project::NAME_SIZE,
+                        :maxlength=>Project::NAME_MAX_LENGTH,
+                        :onblur=>remote_function(:url=>{:controller => 'projects', :action=> 'test_name'})%>  
+  </div> 
+
+  <div class="form_row">
+    Description:<span id="errorMessageForProjectDescription"></span><br/>
+    <%= form.text_area  :description, :rows => 1, :cols => 40,
+                        :id=>"projectDescription",
+                        :onblur=>remote_function(:url=>{:controller => 'projects', :action=> 'test_description'}) %>
+  </div>
+  
+
+  <%= submit_tag "Create" %>
+  <%= button_to_function "Cancel" do |page|
+        page.visual_effect :dropOut, "newProject"
+  end %>
+</fieldset>
+<% end %>

@@ -1,0 +1,6 @@
+page.replace_html "newCategory", :partial=>"new"
+page.show "newCategory"
+page.visual_effect(:grow, "newCategory")
+page.draggable "newCategory"
+page.hide "createLinkSelection"
+

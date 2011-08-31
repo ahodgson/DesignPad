@@ -1,0 +1,134 @@
+/* Profile Styles */
+
+td.label {
+  text-align: right;
+  font-weight:  bold;
+  white-space: nowrap;
+}
+
+input {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.edit_link a {
+  text-decoration: none;
+  color: blue;
+}
+
+#left_column {
+  float:  left;
+  width: 300px;
+}
+
+#main_content {
+  margin-left:  320px;
+}
+
+.sidebar_box {
+  background-color: #ddd;
+  border: 1px solid #aaa;
+  font-size: 12px;
+  margin-bottom:  10px;
+}
+
+.sidebar_box h2 {
+   margin-top:  0px;
+   padding: 6px;
+   background-color: #ccc;
+   font-size: 13px;
+   color: navy;
+   font-weight:bold;
+}
+.sidebar_box p {
+   padding-left:  6px;
+   padding-right: 6px;
+}
+
+.sidebar_box .header  {
+  float: left;
+}
+
+.sidebar_box .edit_link {
+  float: right;
+}
+
+#user_team_id{
+    min-width:100px;
+}
+
+
+/* Spec Style */
+
+#full_name  {
+  font-size: xx-large;
+}
+
+#occupation{
+  font-size: x-large;
+}
+
+#location {
+  font-size:  large;
+}
+
+
+/* FAQ Style */
+
+.faq {
+  float: left;
+  padding: 20px;
+}
+
+#bio {
+  padding: 10px;
+}
+.sidebar_box_contents, .faq_answer {
+  padding:  0 10px 10px 10px;
+}
+
+.faq_answer textarea {
+  width:  280px;
+  background: #ff9;
+}
+
+
+/* Blog Styles */
+
+.post {
+  display: block;
+  margin-bottom: 1.5em;
+}
+.post_title {
+  font-weight: bold;
+}
+.post_body {
+  padding: 1em;
+}
+.post_creation_date, .post_modification_date {
+  text-align: right;
+}
+.post_actions {
+  float: right;
+}
+
+
+/* Comment Styles */
+
+.comment {
+  min-height: 70px;
+}
+#new_comment_form{
+    cursor:-moz-grab;
+    position:absolute;
+    z-index:1000;
+}
+#new_comment_form fieldset{
+    max-width:550px;
+    max-height:100px;
+}
+
+.thumbnail {
+  display: block;
+  float: left;
+  margin-right: 1em;
+}

@@ -1,0 +1,22 @@
+
+<% if concept %>
+	<% entity = concept %>
+<% end %>
+
+  <% if logged_in? %>
+
+    <div id="add_comment_link">
+      <%= link_to "<b>Add a comment</b>",  :url=>new_comment_path,
+												  #:before=>"",
+                                                  :method=>:get,
+                                                  :with=>"'concept_id='+#{entity.id}",
+												  :remote => true %>
+    </div>
+    <div id="new_comment_form"></div>
+  <% end %>
+
+  <br clear="all"/>
+  
+  <div id="comments">
+    <%= render :partial => "comments/comment", :collection => entity.comments %>
+  </div>

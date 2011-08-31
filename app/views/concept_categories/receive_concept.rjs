@@ -1,0 +1,31 @@
+
+page.replace @element_to_move_id,
+    "<li id='tmp'>
+      <span class='concept_icon icon'><img src='/images/concept.jpg'/></span>
+      <span class='concept_list_title list_title' >"+@concept.name+"</span>
+    </li>"
+page.visual_effect(:shrink, 'tmp')
+page.delay(1) do
+  page.remove 'tmp'
+  # remove concept_category_ul if no concepts left in that category
+  if @existing_concepts_for_previous_category_after_drag.length==0
+    page.remove @previous_concept_category_id.to_s+'_concept_category_ul'
+  end
+  page<<"addExpansionMarksForUL($(#{@post_concept_category_id.to_s}+'_concept_category_li').parentNode);"
+  page<<"click($(#{@concept_id.to_s}+'_concept_list_title'))"
+end
+
+# add concept_category_ul if the category is originally empty
+if @existing_concepts_for_post_category_before_drag.length==0
+  page.insert_html :bottom, @post_concept_category_id.to_s+'_concept_category_li', :partial=>"concept_categories/concept_category_ul", :locals=>{:concept_category=>@post_concept_category}
+else
+  page.insert_html :top, @post_concept_category_id.to_s+'_concept_category_ul', :partial=>"concepts/concept_li", :locals=>{:concept=>@concept}
+end
+
+page.show @post_concept_category_id.to_s+'_concept_category_ul'
+page<<"fold($(#{@concept_id.to_s}+'_concept_li'));"
+page.visual_effect(:grow, @concept_id.to_s+'_concept_li', :duration=>1)
+
+#===active the line below if use dynamic icon
+#page<<"addIcons($(#{@concept_id.to_s}+'_concept_li'));"
+

@@ -1,0 +1,14 @@
+<h1>Editing function_structure_diagram</h1>
+
+<% if @function_structure_diagram %>
+	<%= errors_for @function_structure_diagram %>
+<% end %>
+
+<% form_for(:function_structure_diagram, :url => function_structure_diagram_path(@function_structure_diagram), :html => { :method => :put }) do |f| %>
+  <p>
+    <%= submit_tag "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', function_structure_diagram_path(@function_structure_diagram) %> |
+<%= link_to 'Back', function_structure_diagrams_path %>

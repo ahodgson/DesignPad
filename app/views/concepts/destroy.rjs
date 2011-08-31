@@ -1,0 +1,2 @@
+page.visual_destroy("#{@concept.id}_concept_li", "#{@concept.concept_category.id}_concept_category_list_title")
+

@@ -1,0 +1,35 @@
+object1:
+  id: 1001
+  project_id: 1001
+  name: Vehicle
+  description: description for vehicle
+object2:
+  id: 1002
+  project_id: 1001
+  name: Driver
+  description: description for driver
+object3:
+  id: 1003
+  project_id: 1001
+  name: Road
+  description: description for road
+object4:
+  id: 1004
+  project_id: 1001
+  name: screw
+  description: none
+object5:
+  id: 1005
+  project_id: 1001
+  name: lift
+  description: none
+object6:
+  id: 1006
+  project_id: 1001
+  name: clamp
+  description: none
+object7:
+  id: 1007
+  project_id: 1001
+  name: glue
+  description: none

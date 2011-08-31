@@ -1,0 +1,15 @@
+<h2>Your Basic Information</h2>
+<ul>
+	<li>Screen name: <b><%= @user.screen_name%></b></li>
+	<li>Email: <%= @user.email%></li>
+	<li>Password: ******</li>
+</ul>
+<!-- menu-->
+<ul>
+	<li><%= link_to "Edit my info", :action => "edit" %></li>
+	<li><%= nav_link "Create FSD", "fsds", "list"%></li>
+</ul>
+
+
+
+

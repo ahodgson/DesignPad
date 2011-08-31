@@ -1,0 +1,18 @@
+<h1>Listing function_structure_diagrams</h1>
+
+<table>
+  <tr>
+  </tr>
+  
+<% for function_structure_diagram in @function_structure_diagrams %>
+  <tr>
+    <td><%= link_to 'Show', function_structure_diagram_path(function_structure_diagram) %></td>
+    <td><%= link_to 'Edit', edit_function_structure_diagram_path(function_structure_diagram) %></td>
+    <td><%= link_to 'Destroy', function_structure_diagram_path(function_structure_diagram), :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New function_structure_diagram', new_function_structure_diagram_path %>

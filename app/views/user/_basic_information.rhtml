@@ -1,0 +1,29 @@
+<div id="basic_information" class="sidebar_box">
+    <h2>
+      <span class="header">Basic Information</span>
+      <span class="edit_link"><%= link_to "(edit)", :action => "edit" %></span>
+      <br clear="all" />
+    </h2>
+    <div class="sidebar_box_contents">
+      <table>
+        <tr>
+          <td class="label">Screen name:</td>
+          <td><%= @user.screen_name %></td>
+        </tr>
+        <tr>
+          <td class="label">Email:</td>
+          <td><%= @user.email %></td>
+        </tr>      
+        <tr>
+          <td class="label">Password:</td>
+          <td>********</td>
+        </tr>
+        <% if @user.team %>
+          <tr id="team_name_tr">
+            <td class="label">Team:</td>
+            <td><%= @user.team.name %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>

@@ -1,0 +1,12 @@
+if @condition=="shared_available_object"
+  page.replace @known_object.id.to_s+'_known_object_li', :partial=>"known_objects/known_object_li", :locals=>{:known_object=>@known_object, :function_structure_diagram=>@function_structure_diagram, :entity_model_name=>@entity_model_name}
+elsif @condition=="shared_unavailable_object"
+  page.refresh_available_objects(@function_structure_diagram, @entity_model_name)
+  #page.delay() do
+    #page<<"click($('#{@known_object.id.to_s}_known_object_list_title'))"
+  #end
+elsif @condition=="unshared_object"
+  page.visual_destroy("#{@known_object.id}_known_object_li")
+end
+
+page<<"cancelHighlightedSynergy();"

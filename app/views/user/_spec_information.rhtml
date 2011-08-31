@@ -1,0 +1,15 @@
+  <div id="spec_information" class="sidebar_box">
+    <h2>
+      <span class="header">Specific Information</span>
+      <span class="edit_link">
+        <%= link_to "(edit)", :controller => "spec", :action => "edit" %>
+      </span>
+      <br clear="all" />
+    </h2>
+    <div class="sidebar_box_contents">
+      <table>
+        <%= render :partial    => "spec/field_row",
+                   :collection => Spec::ALL_FIELDS %>
+      </table>
+    </div>
+  </div>

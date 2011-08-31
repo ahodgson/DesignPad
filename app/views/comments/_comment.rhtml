@@ -1,0 +1,22 @@
+<!-- <div id="comment_<%= comment.id %>" class="comment">
+  <hr noshade />
+  
+  <%= if logged_in? and comment.authorized?(User.find(session[:user_id])) %>
+    <span class="edit_link" style="float: right">
+    <%= link_to "(delete)",
+           :url => comment_url(comment),
+           :method => :delete,
+           :confirm => 'Are you sure to delete?' %>
+		   :remote => true
+    </span>
+  <% end %>
+
+  <%= link_to comment.user.name, profile_url(:screen_name=>comment.user.screen_name) %>
+  commented
+  <%= time_ago_in_words comment.created_at %> ago:
+
+  <p>
+    <%= sanitize comment.body %>
+  </p>
+</div>
+-->

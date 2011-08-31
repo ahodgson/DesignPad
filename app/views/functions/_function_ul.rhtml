@@ -1,0 +1,9 @@
+<% concept_categories=function.concept_categories %>
+
+<% unless function.concept_categories.length==0 %>
+  <ul class='function_ul' id='<%= function.id.to_s %>_function_ul'>
+    <% concept_categories.each do |concept_category| %>
+      <%= render :partial=>"concept_categories/concept_category_li", :locals=>{:concept_category=>concept_category} %>
+    <% end %>
+  </ul>
+<% end %>

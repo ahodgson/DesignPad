@@ -1,0 +1,65 @@
+<li class='concept_li' id='<%= concept.id.to_s %>_concept_li'>
+  <span class='expansion_mark' id='<%= concept.id.to_s %>_concept_expansion_mark'></span>
+  <span class='concept_icon icon' id='<%= concept.id.to_s %>_concept_icon'><img src='<%= Concept::ICON_PATH %>' /></span>
+  <span class='concept_list_title list_title' id='<%= concept.id.to_s %>_concept_list_title'><%= concept.name %></span>
+  <a style="display:none"><%= concept.name %></a>
+  <%= render :partial=>"concepts/concept_ul", :locals=>{:concept=>concept} %>
+
+
+  <%#= draggable_element concept.id.to_s+'_concept_list_title', :revert=>true, :ghosting=>false %>
+
+  <%= javascript_tag "jQuery('##{concept.id.to_s}_concept_list_title').draggable({
+                                                    ghosting:false,
+                                                    revert:true,
+                                                    refreshPositions:true  //decrease performance, but solve offset problems
+                                                  });" %>
+  
+  <%= javascript_tag "addEventById('#{concept.id.to_s}_concept_list_title', 'click',
+    function(){
+      makeUniqueClass('selected_list_title', $('#{concept.id.to_s}_concept_list_title'));
+      resetProjectEditPage();
+
+      pictureClue(#{concept.has_picture?})
+
+      // global variables to facilitate onKeyUp()
+      sibSize=#{Concept::NAME_SIZE};
+      sibMaxLength=#{Concept::NAME_MAX_LENGTH};
+      sibDefaultText='New Concept';
+      sibModel='concept';
+      sibSubmitUrl='#{url_for(:controller=>"concepts", :action=>"create")}'
+      superIdName='concept_category_id'
+      superIdValue=#{concept.concept_category.id}
+
+      subSize=#{FunctionStructureDiagram::NAME_SIZE};
+      subMaxLength=#{FunctionStructureDiagram::NAME_MAX_LENGTH};
+      subDefaultText='New FSD';
+      subModel='function_structure_diagram';
+      subSubmitUrl='#{url_for(:controller=>"function_structure_diagrams", :action=>"create")}'
+      selfIdName='concept_id'
+      selfIdValue=#{concept.id}
+
+      #{remote_function(:url=>{:controller => 'concepts', :action=> 'when_list_title_clicked', :concept_id=>concept.id})}
+    },
+    false);" %>
+
+  <%= javascript_tag "$('#{concept.id.to_s}_concept_list_title').onmouseover=function(){removeHover()};" %>
+
+  <%= javascript_tag "$('#{concept.id.to_s}_concept_list_title').oncontextmenu=
+    function(event){
+
+      var evt=getUnifiedEvent(event);
+
+      if(!isOfClass('selected_list_title', this))
+        click(this);
+      else
+        projectEditOnClick(evt);
+
+      #{pop_menu('concept', concept, Concept::NAME_SIZE, Concept::NAME_MAX_LENGTH)}
+      showContextMenu(this, evt, $('pop_menu'));
+
+      //disable default firefox menu
+      return false;
+    }" %>
+</li>
+
+

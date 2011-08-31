@@ -1,0 +1,34 @@
+<h1>User Homepage</h1>
+
+<div id="left_column">
+  <%= render :partial=>"basic_information"%>
+  <%= render :partial=>"spec_information"%>
+
+  <% if @user.team.nil? %>
+    <%= render :partial=>"teams/team_registration", :locals =>{:teams=>Team.find(:all)} %>
+  <% else %>
+    <%= render :partial=>"projects/projects_list", :locals=>{:projects=>@projects} %>
+    <%#= render :partial=>"design_menu"%>
+  <% end %>
+</div>
+
+<div id="main_content">
+  <div id="full_name">
+    <%= h @spec.full_name.or_else("Your Name") %>
+  </div>
+  <div id="occupation">
+    <%= h @spec.student_number.or_else("Your Student Number") %>
+  </div> 
+  <span class="edit_link">
+    <%= link_to "(edit)", :controller => "spec", :action => "edit" %>
+  </span>
+
+  <hr noshade />
+  <%= link_to "User Profile", profile_for(@user) %>
+  <hr noshade />
+
+  <div id="newTeam"></div>
+  <div id="newProject"></div>
+
+  <!--bio here-->
+</div>

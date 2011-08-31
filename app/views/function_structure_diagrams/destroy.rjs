@@ -1,0 +1,9 @@
+if @function_structure_diagram.is_for_project?
+  parent=@function_structure_diagram.project
+  parent_name="project"
+else
+  parent=@function_structure_diagram.concept
+  parent_name="concept"
+end
+
+page.visual_destroy("#{@function_structure_diagram.id}_function_structure_diagram_li", "#{parent.id}_#{parent_name}_list_title")

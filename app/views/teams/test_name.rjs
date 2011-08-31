@@ -1,0 +1,7 @@
+# TODO Operate on the page object
+page<<"var textLength = document.getElementById('teamName').value.length;"
+page<<"if(textLength<#{Team::NAME_MIN_LENGTH}||textLength>#{Team::NAME_MAX_LENGTH})
+          $('errorMessageForTeamName').innerHTML='<i>length out of range(#{Team::NAME_MIN_LENGTH}~#{Team::NAME_MAX_LENGTH})</i>';
+       else
+          $('errorMessageForTeamName').innerHTML='';"
+

@@ -1,0 +1,21 @@
+function1:
+  id: 1001
+  function_structure_diagram_id: 1000
+  name: Function1
+  object1_id: 1001
+  object2_id: 1002
+  relation: support
+  description: first function
+function2:
+  id: 1002
+  function_structure_diagram_id: 1000
+  name: Function2
+  object1_id: 1001
+  object2_id: 1002
+  relation: support
+  description: second function
+function3:
+  id: 1003
+  function_structure_diagram_id: 1000
+  name: Function3
+  description: third function

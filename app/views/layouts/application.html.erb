@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title><%= @title%></title>
+		<%= csrf_meta_tag %>
+		<%= stylesheet_link_tag "site" %>
+		<%= stylesheet_link_tag "profile" %>
+        <%= stylesheet_link_tag "team" %>
+        <%= stylesheet_link_tag "project" %>
+        <%= stylesheet_link_tag "function" %>
+		<!-- Note: a potential confliction w.r.t. stack push remains. -->
+		<%= javascript_include_tag "jquery-1.3.2.min.js"%>
+        <%= javascript_include_tag "jquery-ui-1.7.2.custom.min.js"%>              
+        <script type="text/javascript">
+            var jQuery=$;
+        </script>
+        <%= javascript_include_tag :defaults%>                  
+	</head>
+	
+	<body onload="init();">
+		<div id="whole_page">
+			<div id="header">Design Pad</div>
+		 	<div id="nav">
+		 		<span style="float: right">
+		 			<%if logged_in? -%>
+						<%= nav_link "Hub ", "user", "index" %>|
+						<%= nav_link "Logout ", "user", "logout" %>
+					<%else -%>
+		 				<%= nav_link "Register ", "user", "register" %>|
+						<%= nav_link "Login ", "user", "login" %>
+					<%end -%>
+		 		</span>
+		 		<%= nav_link "Home ", "site"%>|
+				<%= nav_link "About us ", "site", "about"%> | <%= nav_link "Tree", "site", "ex4"%>
+			</div>
+			
+			<div id="content">
+				<%if flash[:notice] -%>
+					<div id="notice"><%= flash[:notice]%></div>
+				<%end -%>
+				<%= @content_for_layout%>
+				<%= yield %>
+				<br clear="all"/>
+			</div>		
+		
+		</div>
+	</body>
+</html>
+
+
+

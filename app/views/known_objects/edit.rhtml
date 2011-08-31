@@ -1,0 +1,12 @@
+<h2>Editing Known Object</h2>
+<!--%= error_messages_for :known_object %-->
+
+<%= errors_for(@known_object) %>
+<% form_for(:known_object, :url => known_object_path(@known_object), :html => { :method => :put }) do |form| %>
+<fieldset>
+  <legend><%=h @known_object.name %></legend>
+  <%= render :partial => "form", :locals => { :form => form } %>
+  <%= submit_tag "Update", :class => "submit" %>
+  <button type="button" onclick="location.href='/projects/<%= session[:project_id] %>'" >Back</button>
+</fieldset>
+<% end %>

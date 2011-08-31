@@ -1,0 +1,2 @@
+# TODO Operate on the page object
+page.replace "functions_list", :partial=>"functions_list", :locals=>{:functions=>@functions, :function_structure_diagram_id=>@function_structure_diagram.id}

@@ -1,0 +1,14 @@
+<div class="form_row">
+  Name:<span id="error_message_for_known_object_name"></span><br/>
+  <%= form.text_field :name,
+                      :id=>"known_object_name",
+                      :size=>KnownObject::NAME_SIZE,
+                      :maxlength=>KnownObject::NAME_MAX_LENGTH,
+                      :onblur=>""%>
+</div>
+<div class="form_row">
+    Description:<span id="error_message_for_known_object_description"></span><br/>
+    <%= form.text_area  :description, :rows => 2, :cols => 30,
+                        :id=>"known_object_description",
+                        :onblur=>"" %>
+</div>

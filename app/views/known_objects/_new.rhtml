@@ -1,0 +1,10 @@
+<% remote_form_for(:known_object, :url => known_objects_path ) do |form| %>
+<fieldset>
+  <legend>New Object</legend>
+  <%= render :partial => "remote_form", :locals => { :form => form } %>
+  <%= submit_tag "Create", :class => "submit" %>
+  <%= button_to_function "Cancel" do |page|
+        page.visual_effect :dropOut, "new_known_object"
+  end %>
+</fieldset>
+<% end %>

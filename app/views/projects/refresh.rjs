@@ -1,0 +1,6 @@
+page.replace_html "project_tree_content", :partial=>"projects/root_ul", :locals=>{:project=>@project}
+page<<"addExpansionMarksForUL($('#{@project.id.to_s}_root_ul'))"
+page.hide "project_tree_wait_icon"
+page.delay() do
+  page<<"click($('#{@project.id.to_s}_project_list_title'));"
+end

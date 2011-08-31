@@ -1,0 +1,55 @@
+<li class='function_li' id='<%= function.id.to_s %>_function_li'>
+  <span class='expansion_mark' id='<%= function.id.to_s %>_function_expansion_mark'></span>
+  <span class='function_icon icon' id='<%= function.id.to_s %>_function_icon'><img src='<%= Function::ICON_PATH %>' /></span>
+  <span class='function_list_title list_title' id='<%= function.id.to_s %>_function_list_title'><%= function.name %></span>
+ <a style="display:none"><%= function.name %></a>
+  <%= render :partial=>"functions/function_ul", :locals=>{:function=>function} %>
+
+
+  <%= javascript_tag "addEventById('#{function.id.to_s}_function_list_title', 'click',
+    function(){
+
+      makeUniqueClass('selected_list_title', $('#{function.id.to_s}_function_list_title'));
+      resetProjectEditPage();
+
+      // global variables to facilitate onKeyUp()
+      sibSize=#{Function::NAME_SIZE};
+      sibMaxLength=#{Function::NAME_MAX_LENGTH};
+      sibDefaultText='New Function';
+      sibModel='function';
+      sibSubmitUrl='#{url_for(:controller=>"functions", :action=>"create")}'
+      superIdName='function_structure_diagram_id'
+      superIdValue=#{function.function_structure_diagram.id}
+
+      subSize=#{ConceptCategory::NAME_SIZE};
+      subMaxLength=#{ConceptCategory::NAME_MAX_LENGTH};
+      subDefaultText='New Concept Category';
+      subModel='concept_category';
+      subSubmitUrl='#{url_for(:controller=>"concept_categories", :action=>"create")}'
+      selfIdName='function_id'
+      selfIdValue=#{function.id}
+
+      #{remote_function(:url=>{:controller => 'functions', :action=> 'when_list_title_clicked', :function_id=>function.id})}
+    },
+    false);" %>
+
+  <%= javascript_tag "$('#{function.id.to_s}_function_list_title').onmouseover=function(){removeHover()};" %>
+
+  <%= javascript_tag "$('#{function.id.to_s}_function_list_title').oncontextmenu=
+    function(event){
+
+      var evt=getUnifiedEvent(event);
+
+      if(!isOfClass('selected_list_title', this))
+        click(this);
+      else
+        projectEditOnClick(evt);
+
+      #{pop_menu('function', function, Function::NAME_SIZE, Function::NAME_MAX_LENGTH, {:attribute=>'list_title'})}
+      showContextMenu(this, evt, $('pop_menu'));
+
+      //disable default firefox menu
+      return false;
+    }" %>
+</li>
+
