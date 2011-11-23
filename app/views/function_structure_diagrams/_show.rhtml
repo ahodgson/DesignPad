@@ -8,13 +8,12 @@
       <%= javascript_include_tag "excanvas" %>
     <![endif]-->
 
-    <!-- do no need to explicitly include js files because rails automatically includes them if they're in assets/javascripts thanks to application.js -->
     <%= javascript_include_tag "jit" %>
     <%= javascript_include_tag "jit-spacetree" %>
   </head>
 
   <!-- render the JIT tree of the current FSD in its JSON representation (the FSD will be the root node) -->
-  <body onload="init( <%= @function_structure_diagram.to_json %> );">
+  <body onload="init( <%= function_structure_diagram.to_json %> );">
     <div id="infovis"></div>
     <div id="log"></div>
   </body>

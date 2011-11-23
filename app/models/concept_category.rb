@@ -6,7 +6,7 @@
 
 class ConceptCategory < ActiveRecord::Base
   belongs_to :function
-  has_many :concepts, :conditions => {:deleted => false}
+  has_many :concepts#, :conditions => {:deleted => false}
 
   NO_CATEGORY="Unclassified"
 

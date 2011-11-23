@@ -5,7 +5,7 @@
 # @date: 12/24/2009
 
 class FunctionStructureDiagram < ActiveRecord::Base
-  has_many :functions, :dependent=>:destroy, :conditions => {:deleted => false}
+  has_many :functions, :dependent=>:destroy#, :conditions => {:deleted => false}
   has_many :object_ownerships, :dependent=>:destroy
   has_many :known_objects, :through=>:object_ownerships
   has_one :project, :dependent=>:destroy
