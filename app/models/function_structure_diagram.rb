@@ -5,7 +5,7 @@
 # @date: 12/24/2009
 
 class FunctionStructureDiagram < ActiveRecord::Base
-  has_many :functions, :dependent=>:destroy
+  has_many :functions, :dependent=>:destroy, :conditions => {:deleted => false}
   has_many :object_ownerships, :dependent=>:destroy
   has_many :known_objects, :through=>:object_ownerships
   has_one :project, :dependent=>:destroy
@@ -74,4 +74,8 @@ class FunctionStructureDiagram < ActiveRecord::Base
     self.picture=diagram_in.read
   end
   
+  # defines the JSON representation of the FSD objects to be rendered in the JIT tree
+  def as_json( options={} )
+    { :id => id.to_s + "_fsd", :name => name, :data => description, :children => functions }
+  end
 end

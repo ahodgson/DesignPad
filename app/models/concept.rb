@@ -150,4 +150,9 @@ class Concept < ActiveRecord::Base
 		end
 	end
   
+  # defines the JSON representation of the concept category objects to be rendered in the JIT tree
+  def as_json( options={} )
+    { :id => id.to_s + "_con", :name => name, :data => description, :children => concepts }
+  end
+  
 end

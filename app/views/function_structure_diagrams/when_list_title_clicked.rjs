@@ -18,5 +18,5 @@ if @function_structure_diagram.has_picture?
   page.replace_html :project_view_clue, link_to("(delete)", {:controller=>"function_structure_diagrams", :action=>"delete_picture", :id=>@function_structure_diagram}, :confirm=>'Are you sure to delete?')
 else
   page.replace_html :project_view_clue, "No image found."
-  page.replace_html :project_view_content, :partial=>"functions/function_module", :locals=>{:function_structure_diagram=>@function_structure_diagram}
+  page.replace_html :project_view_content, :partial=>"function_structure_diagrams/show", :locals=>{:function_structure_diagram=>@function_structure_diagram}
 end
