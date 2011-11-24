@@ -13,11 +13,19 @@
 
 		<!-- Note: a potential confliction w.r.t. stack push remains. -->
 
-		<%= javascript_include_tag "jquery-1.3.2.min.js" %>
+		<%= javascript_include_tag "jquery-1.7.min.js" %>
     <%= javascript_include_tag "jquery-ui-1.7.2.custom.min.js" %>
       <script type="text/javascript">
         var jQuery=$;
       </script>
+
+    <!--[if IE]>
+      <%= javascript_include_tag "excanvas" %>
+    <![endif]-->
+
+    <%= javascript_include_tag "jit" %>
+    <%= javascript_include_tag "jit-spacetree" %>
+
     <%= javascript_include_tag :defaults %>
 	</head>
 

@@ -3,17 +3,10 @@
   <head>
     <%= stylesheet_link_tag "base" %>
     <%= stylesheet_link_tag "Spacetree" %>
-
-    <!--[if IE]>
-      <%= javascript_include_tag "excanvas" %>
-    <![endif]-->
-
-    <%= javascript_include_tag "jit" %>
-    <%= javascript_include_tag "jit-spacetree" %>
   </head>
 
   <!-- render the JIT tree of the current FSD in its JSON representation (the FSD will be the root node) -->
-  <body onload="init( <%= function_structure_diagram.to_json %> );">
+  <body onload="initST( <%= function_structure_diagram.to_json %> );">
     <div id="infovis"></div>
     <div id="log"></div>
   </body>

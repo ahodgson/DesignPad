@@ -666,8 +666,8 @@ if( st.clickedNode._depth < 1 ) { // REMOVE CHECK WHEN IN DESIGNPAD; this check'
 
 // renders the JIT tree with the JSON representation as a parameter
 //init data
-function init( fsdJSON ) {
-
+function initST( fsdJSON ) {
+alert("hi");
   // assign a variable, with the value of the JSON representation, to be used when rendering the JIT tree
   var treeJSON = fsdJSON;
 
