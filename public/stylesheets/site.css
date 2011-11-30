@@ -1,30 +1,30 @@
 body {
-  font-family:sans-serif;
+  font-family: sans-serif;
   background: gray;
   margin: 0;
   text-align: center;
 }
 #container {
-    position: relative;
-	background-color="#fff"
+  position: relative;
+  background-color: #fff;
 }
 #imageView {
-    border: 1px solid #000000;
-	background-color:#fff;
+  border: 1px solid #000000;
+  background-color: #fff;
 }
 #imageTemp {
-    left: 1px;
-    position: absolute;
-    top: 1px;
+  left: 1px;
+  position: absolute;
+  top: 1px;
 }
 #whole_page {
   width: 50em;
   margin: auto;
   padding: 0;
   text-align: left;
-  border-width:  0 1px 1px 1px;
-  border-color:  black;
-  border-style:  solid;
+  border-width: 0 1px 1px 1px;
+  border-color: black;
+  border-style: solid;
 }
 
 #header {
@@ -43,12 +43,12 @@ body {
   padding: 0.5em;
 }
 
-#nav a, #nav a:visited  {
+#nav a, #nav a: visited  {
   color: navy;
   text-decoration: none;
 }
 
-#nav a:hover {
+#nav a: hover {
   border-bottom: 2px dotted navy;
 }
 
@@ -65,33 +65,32 @@ body {
 /* Hack to get IE to display fieldset/legend correctly */
 .non_firefox fieldset {
   position: relative;
+  margin-top: 1em;
+  padding-top: 2em;
+  padding-bottom: 2em;
 }
 
 .non_firefox legend {
-  position:absolute;
+  position: absolute;
   top: -1em;
   left: .5em;
 }
 
-.non_firefox fieldset {
-  position: relative;
-  margin-top:1em;
-  padding-top:2em;
-  padding-bottom: 2em;
-}
-
 /* Form Styles */
 fieldset {
-  -moz-border-radius:10px;
+  -moz-border-radius: 10px;
   background: #ddd;
+  margin: 10px;
+  padding: 0;
 }
 
 legend {
-  -moz-border-radius:10px;
-  font-weight:bold;
+  -moz-border-radius: 10px;
+  font-weight: bold;
   color: white;
   background: navy;
-  padding: .4em 1em;
+  margin: 0px 10px;
+  padding: 5px 10px;
 }
 
 label {
@@ -99,16 +98,17 @@ label {
   float: left;
   text-align: right;
   margin-right: 0.2em;
+  padding-top: 3px;
   display: block;
 }
 
 div {
-    /* -moz-border-radius: 5px; */
+  /* -moz-border-radius: 5px; */
 }
 
 .form_row {
   white-space: nowrap;
-  padding-bottom: .5em;
+  padding: 5px 0px;
 }
 
 .submit {
@@ -201,7 +201,7 @@ a, a#visited {
   margin: 2px
 }
 
-.link:hover {
+.link: hover {
   background: #fe4;
 }
 
@@ -212,7 +212,7 @@ a, a#visited {
 }
 
 table.list {
-  float:left;
+  float: left;
   background: #fff;
   margin-left: 0em;
   margin-bottom: 1em;
@@ -245,28 +245,28 @@ table.list tr.odd {
 /*Funcion Structure Diagram style*/
 
 #description {
-    margin-top: 2em;
+  margin-top: 2em;
 }
 .description{
-    margin-left: 2em;
+  margin-left: 2em;
 }
 .diagram{
-    background-color:gray;
-    width:30em;
-    height:18em;
-    margin-left:240px;
-    border-width: 1px 1px 1px 1px;
-    border-color: black;
-    border-style: solid;
-    padding:10pt;
+  background-color: gray;
+  width: 30em;
+  height: 18em;
+  margin-left: 240px;
+  border-width: 1px 1px 1px 1px;
+  border-color: black;
+  border-style: solid;
+  padding: 10pt;
 }
 /*----end for design menu-------*/
 
 
 
 
-ul li a:hover {
-    color: #E2144A; background: #f9f9f9;
+ul li a: hover {
+  color: #E2144A; background: #f9f9f9;
 }
 
 

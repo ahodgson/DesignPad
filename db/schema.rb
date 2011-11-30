@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110527021929) do
+ActiveRecord::Schema.define(:version => 20111125002124) do
 
   create_table "comments", :force => true do |t|
     t.integer  "user_id",    :null => false
@@ -21,17 +21,18 @@ ActiveRecord::Schema.define(:version => 20110527021929) do
   end
 
   create_table "concept_categories", :force => true do |t|
-    t.integer  "function_id", :null => false
-    t.string   "name",        :null => false
+    t.integer  "function_id",                    :null => false
+    t.string   "name",                           :null => false
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "deleted",     :default => false
   end
 
   create_table "concepts", :force => true do |t|
-    t.integer  "user_id",                                           :null => false
-    t.integer  "function_structure_diagram_id",                     :null => false
-    t.integer  "concept_category_id",                               :null => false
+    t.integer  "user_id",                                                              :null => false
+    t.integer  "function_structure_diagram_id",                                        :null => false
+    t.integer  "concept_category_id",                                                  :null => false
     t.string   "name"
     t.text     "description"
     t.binary   "picture",                       :limit => 16777215
@@ -42,19 +43,21 @@ ActiveRecord::Schema.define(:version => 20110527021929) do
     t.string   "avatar_content_type"
     t.integer  "avatar_file_size"
     t.datetime "avatar_updated_at"
+    t.boolean  "deleted",                                           :default => false
   end
 
   create_table "function_structure_diagrams", :force => true do |t|
-    t.integer  "user_id",                         :null => false
+    t.integer  "user_id",                                            :null => false
     t.string   "name"
     t.text     "description"
     t.binary   "picture",     :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "deleted",                         :default => false
   end
 
   create_table "functions", :force => true do |t|
-    t.integer  "function_structure_diagram_id",                     :null => false
+    t.integer  "function_structure_diagram_id",                                        :null => false
     t.integer  "object1_id"
     t.integer  "object2_id"
     t.string   "relation"
@@ -63,6 +66,7 @@ ActiveRecord::Schema.define(:version => 20110527021929) do
     t.binary   "picture",                       :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "deleted",                                           :default => false
   end
 
   create_table "known_objects", :force => true do |t|

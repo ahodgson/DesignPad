@@ -9,9 +9,9 @@ class User < ActiveRecord::Base
   belongs_to :team
   
   has_one :spec, :dependent=>:destroy
-  has_many :concepts, :dependent=>:destroy, :order=>"created_at DESC"
+  has_many :concepts, :dependent=>:destroy, :order=>"created_at DESC", :conditions => {:deleted => false}
   has_many :projects, :dependent=>:destroy, :order=>"created_at DESC"
-  has_many :function_structure_diagram, :dependent=>:destroy, :order=>"created_at DESC"
+  has_many :function_structure_diagram, :dependent=>:destroy, :order=>"created_at DESC", :conditions => {:deleted => false}
   has_many :comments, :order=>"created_at DESC", :dependent=>:destroy
   
   attr_accessor :remember_me

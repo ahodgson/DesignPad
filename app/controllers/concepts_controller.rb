@@ -27,6 +27,7 @@ class ConceptsController < ApplicationController
     respond_to do |format|
       format.html # show.rhtml
       format.xml  { render :xml => @concept.to_xml }
+      format.json { render json: @concept }
     end
   end
 
@@ -51,8 +52,9 @@ class ConceptsController < ApplicationController
       if not @concept.nil?
         flash[:notice] = 'Concept was successfully created.'
         format.html { redirect_to concept_url(@concept) }
-        format.xml  { head :created, :location => concept_url(@concept) }        
+        format.xml  { head :created, :location => concept_url(@concept) }
         format.js #instant_create.rjs
+        format.json { render json: @concept, status: :created, location: @concept }
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @concept.errors.to_xml }
@@ -61,6 +63,7 @@ class ConceptsController < ApplicationController
             page.fail_instant_create
           end
         end
+        format.json { render json: @concept.errors, status: :unprocessable_entity }
       end
     end
 
@@ -71,19 +74,31 @@ class ConceptsController < ApplicationController
   def update
     @concept = Concept.find(params[:id])
 
-    respond_to do |format|
-      if @concept.update_attributes(params[:concept])
-        flash[:notice] = 'Concept was successfully updated.'
-        format.html { redirect_to :id=>session[:project_id], :action=>"edit", :controller=>"projects", :concept_id=>@concept.id }
-        format.xml  { head :ok }
-        format.js #update.rjs
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @concept.errors.to_xml }
-        format.js do
-          render :update do |page|
-            page.fail_instant_update
+    # check needed because project_id is nil when updating through the JIT SpaceTree
+    if not session[:project_id].nil?
+      respond_to do |format|
+        if @concept.update_attributes(params[:concept])
+          flash[:notice] = 'Concept was successfully updated.'
+          format.html { redirect_to :id=>session[:project_id], :action=>"edit", :controller=>"projects", :concept_id=>@concept.id }
+          format.xml  { head :ok }
+          format.js #update.rjs
+        else
+          format.html { render :action => "edit" }
+          format.xml  { render :xml => @concept.errors.to_xml }
+          format.js do
+            render :update do |page|
+              page.fail_instant_update
+            end
           end
+        end
+      end
+    # for the JIT SpaceTree
+    else
+      respond_to do |format|
+        if @concept.update_attributes(params[:concept])
+          format.html { redirect_to @concept, notice: 'Concept was successfully updated.' }
+        else
+          format.html { render action: "edit" }
         end
       end
     end
@@ -106,12 +121,12 @@ class ConceptsController < ApplicationController
   def when_list_title_clicked
     @concept_id=params[:concept_id]
     @concept=Concept.find(@concept_id)
-    
+
     @function_structure_diagram=@concept.function_structure_diagram
     @entity_model_name='concept'
 
     @known_objects=@concept.function_structure_diagram.known_objects
-    
+
     respond_to do |format|
       format.js #when_list_title_clicked.rjs
     end
@@ -130,7 +145,7 @@ class ConceptsController < ApplicationController
       end
     end
   end
-  
+
   # called when a diagram is being deleted, updates the picutre to null
   def delete_picture
     @concept_id=params[:id]
@@ -148,8 +163,8 @@ class ConceptsController < ApplicationController
 
   def get_picture
      @concept=Concept.find(params[:id])
-	 
+
      #send_data(@concept.picture, :type=>'image/jpeg')
   end
-  
+
 end

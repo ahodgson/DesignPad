@@ -5,8 +5,9 @@
     <%= stylesheet_link_tag "Spacetree" %>
   </head>
 
-  <!-- render the JIT tree of the current FSD in its JSON representation (the FSD will be the root node) -->
-  <body onload="initST( <%= function_structure_diagram.to_json %> );">
+  <!-- render the JIT SpaceTree of the current FSD in its JSON representation (the FSD will be the root node) -->
+  <body>
+    <%= javascript_tag "initST( #{function_structure_diagram.to_json} );" %>
     <div id="infovis"></div>
     <div id="log"></div>
   </body>

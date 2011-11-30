@@ -12,7 +12,7 @@ class FunctionsController < ApplicationController
   # GET /functions.xml
   def index
     @functions = Function.all
- 
+
     respond_to do |format|
       format.html # index.rhtml
       format.xml  { render :xml => @functions.to_xml }
@@ -27,6 +27,7 @@ class FunctionsController < ApplicationController
     respond_to do |format|
       format.html # show.rhtml
       format.xml  { render :xml => @function.to_xml }
+      format.json { render json: @function }
     end
   end
 
@@ -43,37 +44,53 @@ class FunctionsController < ApplicationController
   # POST /functions
   # POST /functions.xml
   def create
-    @function = Function.new(params[:function])
-    @project= Project.find(session[:project_id])
-    @function_structure_diagram_id=@project.function_structure_diagram.id
+    # check needed because project_id is nil when updating through the JIT SpaceTree
+    if not session[:project_id].nil?
+      @function = Function.new(params[:function])
+      @project= Project.find(session[:project_id])
+      @function_structure_diagram_id=@project.function_structure_diagram.id
 
-    if params[:function][:function_structure_diagram_id]
-      @function_structure_diagram_id=params[:function][:function_structure_diagram_id]
-    end
-    
-    @name=params[:function][:name]
-    @function=Function.create_with_default_category(@function_structure_diagram_id, @name)
+      if params[:function][:function_structure_diagram_id]
+        @function_structure_diagram_id=params[:function][:function_structure_diagram_id]
+      end
 
-    respond_to do |format|
-      if not @function.nil? #@function_structure_diagram.functions<<@function
-        flash[:notice] = 'Function was successfully created.'
-        format.html { redirect_to project_url(@project) }
-        format.xml  { head :created, :location => function_url(@function) }
-        format.js #create.rjs
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @function.errors.to_xml }
-        format.js do
-          render :update do |page|
-            page.fail_instant_create
+      @name=params[:function][:name]
+      @function=Function.create_with_default_category(@function_structure_diagram_id, @name)
+
+      respond_to do |format|
+        if not @function.nil? #@function_structure_diagram.functions<<@function
+          flash[:notice] = 'Function was successfully created.'
+          format.html { redirect_to project_url(@project) }
+          format.xml  { head :created, :location => function_url(@function) }
+          format.js #create.rjs
+          format.json { render json: @function, status: :created, location: @function }
+        else
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @function.errors.to_xml }
+          format.js do
+            render :update do |page|
+              page.fail_instant_create
+            end
           end
+          format.json { render json: @function.errors, status: :unprocessable_entity }
+        end
+      end
+    # for the JIT SpaceTree
+    else
+      @function = Function.new(params[:function])
+
+      respond_to do |format|
+        if @function.save
+          format.json { render json: @function, status: :created, location: @function }
+        else
+          format.json { render json: @function.errors, status: :unprocessable_entity }
         end
       end
     end
   end
 
   def instant_create
-    
+
 
   end
 
@@ -81,22 +98,36 @@ class FunctionsController < ApplicationController
   # PUT /functions/1
   # PUT /functions/1.xml
   def update
-    make_function_vars
-    @attribute=params[:attribute]
+    # check needed because project_id is nil when updating through the JIT SpaceTree
+    if not session[:project_id].nil?
+      make_function_vars
+      @attribute=params[:attribute]
 
-    respond_to do |format|
-      if @function.update_attributes(params[:function])
-        flash[:notice] = 'Function was successfully updated.'
-        format.html { redirect_to project_url(@project) }
-        format.xml  { head :ok }
-        format.js #update.rjs
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @function.errors.to_xml }
-        format.js do
-          render :update do |page|
-            page.fail_instant_update
+      respond_to do |format|
+        if @function.update_attributes(params[:function])
+          flash[:notice] = 'Function was successfully updated.'
+          format.html { redirect_to project_url(@project) }
+          format.xml  { head :ok }
+          format.js #update.rjs
+        else
+          format.html { render :action => "edit" }
+          format.xml  { render :xml => @function.errors.to_xml }
+          format.js do
+            render :update do |page|
+              page.fail_instant_update
+            end
           end
+        end
+      end
+    # for the JIT SpaceTree
+    else
+      @function = Function.find(params[:id])
+
+      respond_to do |format|
+        if @function.update_attributes(params[:function])
+          format.html { redirect_to @function, notice: 'Function was successfully updated.' }
+        else
+          format.html { render action: "edit" }
         end
       end
     end
@@ -124,7 +155,7 @@ class FunctionsController < ApplicationController
     @entity_model_name='function'
 
     @known_objects=@function.function_structure_diagram.known_objects
-    
+
     respond_to do |format|
       format.js #when_list_title_clicked.rjs
     end
@@ -154,5 +185,5 @@ class FunctionsController < ApplicationController
     @concept_categories=@function.concept_categories #<<ConceptCategory.new({:name=>"Unclassified"})
     @title="Edit Function #{@function.name}"
   end
-  
+
 end

@@ -70,6 +70,16 @@ class Concept < ActiveRecord::Base
     !(function_structure_diagram.nil? || function_structure_diagram.name.nil?)
   end
 
+  # Returns true if the concept's function structure diagram's "deleted" value is true (i.e. it was soft-deleted by the user in the JIT SpaceTree)
+  def fsd_is_deleted?
+    function_structure_diagram = self.function_structure_diagram
+    if( function_structure_diagram.deleted == true)
+      return true
+    else
+      return false
+    end
+  end
+
   # Create a concept and a function structure diagram without name for it
   def self.create_with_default_function_structure_diagram(user_id, concept_category_id, name)
     transaction do
@@ -150,13 +160,14 @@ class Concept < ActiveRecord::Base
 		end
 	end
 
-  # defines the JSON representation of the concept objects to be rendered in the JIT tree
-  # if the concept's default FSD is not named (by the user), set children to an empty array, otherwise an empty node renders after the concept in the JIT tree
+  # defines the JSON representation of the concept objects to be rendered in the JIT SpaceTree
+  # if the concept's default FSD is not named (by the user), set children to an empty array, otherwise an empty node would render after the concept in the JIT SpaceTree; also render the FSD node only if its "deleted" value is false (i.e. wasn't soft-deleted by user)
+  # also include the function_structure_diagram_id as fsd_id in the JSON for the JIT SpaceTree to allow updating of the concept's FSD's name upon node creation in the JIT SpaceTree
   def as_json( options={} )
-    if has_function_structure_diagram?
+    if has_function_structure_diagram? && !fsd_is_deleted?
       { :id => id.to_s + "_con", :name => name, :data => description, :children => [function_structure_diagram] }
     else
-      { :id => id.to_s + "_con", :name => name, :data => description, :children => [] }
+      { :id => id.to_s + "_con", :name => name, :data => description, :children => [], :fsd_id => function_structure_diagram_id.to_s + "_fsd" }
     end
   end
 

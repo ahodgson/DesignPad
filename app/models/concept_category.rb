@@ -6,7 +6,7 @@
 
 class ConceptCategory < ActiveRecord::Base
   belongs_to :function
-  has_many :concepts#, :conditions => {:deleted => false}
+  has_many :concepts, :conditions => {:deleted => false}
 
   NO_CATEGORY="Unclassified"
 
@@ -38,7 +38,7 @@ class ConceptCategory < ActiveRecord::Base
     end
   end
   
-  # defines the JSON representation of the concept category objects to be rendered in the JIT tree
+  # defines the JSON representation of the concept category objects to be rendered in the JIT SpaceTree
   def as_json( options={} )
     { :id => id.to_s + "_cat", :name => name, :data => description, :children => concepts }
   end

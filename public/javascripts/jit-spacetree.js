@@ -59,44 +59,113 @@ var Log = {
 
 // returns the requested information of a node (with an optional 3rd parameter of a value that needs to be set), depending on the node's depth
 function getNodeInfo( node, info, value ) {
-  // the node is an Object Category
-  if( (node.id === st.root) || (node._depth % 2 === 0) ) {  // if the node is at node depth 0 (root), 2, or 4, etc.
+  // the node is a Function Structure Diagram
+  if( (node.id === st.root) || (node._depth % 4 === 0) ) {  // if the node is at node depth 0 (root), 4, or 8, etc.
     if( info === "resource" ) {
-      return "object_categories";
+      return "function_structure_diagrams";
+    }
+    else if( info === "resource name" ) {
+      return "Function Structure Diagram";
     }
     else if( info === "child resource" ) {
-      return "known_objects";
+      return "functions";
     }
     else if( info === "child resource name" ) {
-      return "Object";
+      return "Function";
     }
     else if( info === "post child data" ) {
-      return { "known_object":{ "name":value, "object_category_id":node.id } };
+      return { "function":{ "name":value, "function_structure_diagram_id":node.id.slice(0,-4) } };
     }
+    // no "else if( info === "post sibling data" )"
     else if( info === "put data" ) {
-      return { "object_category":{ "name":value } };
+      return { "function_structure_diagram":{ "name":value } };
+    }
+    else if( info === "delete data" ) {
+      return { "function_structure_diagram":{ "deleted":value } };
     }
   }
 
-  // the node is an Object
-  else if( node._depth % 2 === 1 ) {  // if the node is at node depth 1, 3, or 5, etc.
+  // the node is a Function
+  else if( node._depth % 4 === 1 ) {  // if the node is at node depth 1, 5, or 9, etc.
     if( info === "resource" ) {
-      return "known_objects";
+      return "functions";
     }
     else if( info === "resource name" ) {
-      return "Object";
+      return "Function";
     }
-    else if( info === "parent resource" ) {
-      return "object_categories";
+    else if( info === "child resource" ) {
+      return "concept_categories";
+    }
+    else if( info === "child resource name" ) {
+      return "Concept Category";
+    }
+    else if( info === "post child data" ) {
+      return { "concept_category":{ "name":value, "function_id":node.id.slice(0,-4) } };
     }
     else if( info === "post sibling data" ) {
-      return { "known_object":{ "name":"New Object", "object_category_id":value } };
+      return { "function":{ "name":"New Function", "function_structure_diagram_id":value } };
     }
     else if( info === "put data" ) {
-      return { "known_object":{ "name":value } };
+      return { "function":{ "name":value } };
     }
     else if( info === "delete data" ) {
-      return { "known_object":{ "deleted":value } };
+      return { "function":{ "deleted":value } };
+    }
+  }
+
+  // the node is a Concept Category
+  else if( node._depth % 4 === 2 ) {  // if the node is at node depth 2, 6, or 10, etc.
+    if( info === "resource" ) {
+      return "concept_categories";
+    }
+    else if( info === "resource name" ) {
+      return "Concept Category";
+    }
+    else if( info === "child resource" ) {
+      return "concepts";
+    }
+    else if( info === "child resource name" ) {
+      return "Concept";
+    }
+    else if( info === "post child data" ) {
+      return { "concept":{ "name":value, "concept_category_id":node.id.slice(0,-4) } };
+    }
+    else if( info === "post sibling data" ) {
+      return { "concept_category":{ "name":"New Concept Category", "function_id":value } };
+    }
+    else if( info === "put data" ) {
+      return { "concept_category":{ "name":value } };
+    }
+    else if( info === "delete data" ) {
+      return { "concept_category":{ "deleted":value } };
+    }
+  }
+
+  // the node is a Concept
+  else if( node._depth % 4 === 3 ) {  // if the node is at node depth 3, 7, or 11, etc.
+    if( info === "resource" ) {
+      return "concepts";
+    }
+    else if( info === "resource name" ) {
+      return "Concept";
+    }
+    else if( info === "child resource" ) {
+      return "function_structure_diagrams";
+    }
+    else if( info === "child resource name" ) {
+      return "Function Structure Diagram";
+    }
+    else if( info === "post child data" ) { // actually "put child data" to update name
+      return { "function_structure_diagram":{ "name":value, "deleted":false } }; // no parent ID needed; must set deleted to false in case it was soft-deleted before
+    }
+    else if( info === "post sibling data" ) {
+      return { "concept":{ "name":"New Concept", "concept_category_id":value } };
+    }
+    else if( info === "put data" ) {
+      return { "concept":{ "name":value } };
+    }
+    else if( info === "delete data" ) {
+      return { "concept":{ "deleted":value } };
     }
   }
 };
@@ -113,72 +182,152 @@ function getParentNode( node ) {
   }
 };
 
-// REST: creates child node in the database and, on success, in the JIT tree
+// REST: creates child node in the database and, on success, in the SpaceTree
 function createChildNode( node, doing ) {
   if( doing !== "undo" ) {  // if the child node is not created in an undo
-    // the node's child's resource
-    var child_resource = getNodeInfo( node, "child resource" );
-    // the created node's name
-    var newNodeName;
-    if( doing !== "redo" ) {  // if the child node is not created in a redo
-      // the node's child's resource name
-      newNodeName = "New " + getNodeInfo( node, "child resource name" );
-    }
-    else {
-      // the name the user entered for the created node before undoing and then redoing
-      newNodeName = newName;
-    }
-    // the data to be set when creating a child node to the node; since the resource key cannot be a variable because it's taken literally, the entire AJAX data is set; set created node's name
-    var postData = getNodeInfo( node, "post child data", newNodeName );
+    // only allow an FSD to be added to the SpaceTree if the node is a Concept without a child nocde (i.e. without an FSD node)
+    if( !( (node._depth % 4 === 3) && (node.anySubnode("exist")) ) ) {  // if the node is not the following: at node depth 3, 7, or 11, etc. and has any children
 
-    // creates entry in database
-    jQuery.ajax( {
-      type: "POST",
-      url: "/"+child_resource+".json",  // need JSON to retrieve created node's data - i.e. its ID
-      data: postData,
-      success: function( newNodeJSON ) {
+      // the node's child's resource
+      var child_resource = getNodeInfo( node, "child resource" );
+      // the created node's name
+      var newNodeName;
+      if( doing !== "redo" ) {  // if the child node is not created in a redo
+        // the node's child's resource name
+        newNodeName = "New " + getNodeInfo( node, "child resource name" );
+      }
+      else {
+        // the name the user entered for the created node before undoing and then redoing
+        newNodeName = newName;
+      }
+      // the data to be set when creating a child node to the node; since the resource key cannot be a variable because it's taken literally, the entire AJAX data is set; set created node's name
+      var postData = getNodeInfo( node, "post child data", newNodeName );
 
-        // the new child node that's added
-        var newNode = {
-          id: node.id, // parent of new node (i.e. node being added to)
-          children: [{
-            id: newNodeJSON.id,
-            name: newNodeName,
-            data: {},
-            children: []
-          }]
-        };
-        // adds a child node to the node
-        Log.write( "adding node..." );
-        st.addSubtree( newNode, "replot", {
-          hideLabels: false,
-          onComplete: function() {
-            Log.write( "node added" );
+      // creates child node (FSD) for a Concept, but actually updates its name instead of creating a new FSD (because a FSD is automatically created with a Concept, but it isn't rendered in the SpaceTree if it doesn't have a name); for other nodes, its appropriate child is created in the SpaceTree and database
+      if( node._depth % 4 === 3 ) {  // if the node is at node depth 3, 7, or 11, etc.
+        // the node's resource
+        var resource = getNodeInfo( node, "resource" );
+        // the node's database ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
+        var resource_id = node.id.slice(0,-4);
+
+        // gets node's data - i.e. its FSD ID
+        jQuery.ajax( {
+          type: "GET",
+          url: "/"+resource+"/"+resource_id+".json",  // need JSON to retrieve node's data - i.e. its ID and name
+          success: function( conceptNodeJSON ) {
+
+            // the node's child's JSON ID
+            var child_JSONid = conceptNodeJSON.fsd_id;
+            // the node's child's database ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
+            var child_id = child_JSONid.slice(0,-4);
+
+            // updates name in database
+            jQuery.ajax( {
+              type: "PUT",
+              url: "/"+child_resource+"/"+child_id,
+              data: postData,
+              success: function() {
+
+                // the new child node that's added
+                var newNode = {
+                  id: node.id, // parent of new node (i.e. node being added to)
+                  children: [{
+                    id: child_JSONid,
+                    name: newNodeName,
+                    data: {},
+                    children: []
+                  }]
+                };
+                // adds a child node to the node
+                Log.write( "adding node..." );
+                st.addSubtree( newNode, "replot", {
+                  hideLabels: false,
+                  onComplete: function() {
+                    Log.write( "node added" );
+                  }
+                });
+
+                // selects the new node (highlights and centers the tree), as if it were clicked
+                st.onClick( child_JSONid );
+
+                if( doing !== "redo" ) {  // if the child node is not created in a redo; no need to enable editing if redo
+                  // changes text to an input field with a value of the node's name
+                  jQuery("#"+child_JSONid).html('<input type="text" value="'+newNodeName+'" />');
+                  // highlights text in input field
+                  jQuery("input").select();
+
+                  // node is now in editing mode
+                  inEditing = true;
+                }
+
+                // variables needed to undo the creation of this child node
+                lastAction = "create";
+                lastNode = st.graph.getNode( child_JSONid );
+                lastParentNode = node;
+
+              }
+            });
+
           }
         });
-
-        // selects the new node (highlights and centers the tree), as if it were clicked
-        st.onClick( newNodeJSON.id );
-
-        if( doing !== "redo" ) {  // if the child node is not created in a redo, no need to enable editing
-          // changes text to an input field with a value of the node's name
-          jQuery("#"+newNodeJSON.id).html('<input type="text" value="'+newNodeName+'" />');
-          // highlights text in input field
-          jQuery("input").select();
-
-          // node is now in editing mode
-          inEditing = true;
-        }
-
-        // variables needed to undo the creation of this child node
-        lastAction = "create";
-        lastNode = st.graph.getNode( newNodeJSON.id );
-        lastParentNode = node;
-
       }
-    });
+
+      else {
+        // creates entry in database
+        jQuery.ajax( {
+          type: "POST",
+          url: "/"+child_resource+".json",  // need JSON to retrieve created node's data - i.e. its ID
+          data: postData,
+          success: function( newNodeJSON ) {
+
+            // the new child node that's added
+            var newNode = {
+              id: node.id, // parent of new node (i.e. node being added to)
+              children: [{
+                id: newNodeJSON.id,
+                name: newNodeName,
+                data: {},
+                children: []
+              }]
+            };
+            // adds a child node to the node
+            Log.write( "adding node..." );
+            st.addSubtree( newNode, "replot", {
+              hideLabels: false,
+              onComplete: function() {
+                Log.write( "node added" );
+              }
+            });
+
+            // selects the new node (highlights and centers the tree), as if it were clicked
+            st.onClick( newNodeJSON.id );
+
+            if( doing !== "redo" ) {  // if the child node is not created in a redo; no need to enable editing if redo
+              // changes text to an input field with a value of the node's name
+              jQuery("#"+newNodeJSON.id).html('<input type="text" value="'+newNodeName+'" />');
+              // highlights text in input field
+              jQuery("input").select();
+
+              // node is now in editing mode
+              inEditing = true;
+            }
+
+            // variables needed to undo the creation of this child node
+            lastAction = "create";
+            lastNode = st.graph.getNode( newNodeJSON.id );
+            lastParentNode = node;
+
+          }
+        });
+      }
+
+    }
+    else {
+      alert( "You may only have one base function structure diagram!" );
+    }
   }
-  // undoing a delete: not actually creating a new child node; just restoring
+
+  // undoing a soft-delete: not actually creating a new child node; just restoring
   else {
     // the deleted node's resource
     var resource = getNodeInfo( lastNode, "resource" );
@@ -229,7 +378,7 @@ function createChildNode( node, doing ) {
   }
 };
 
-// REST: creates sibling node in the database and, on success, in the JIT tree
+// REST: creates sibling node in the database and, on success, in the SpaceTree
 function createSiblingNode( node ) {
   // the node's parent's JSON ID
   var parent_JSONid = getParentNode( node ).id;
@@ -300,7 +449,7 @@ function enableUpdateNode( node ) {
     url: "/"+resource+"/"+resource_id+".json",  // need JSON to retrieve node's data - i.e. its ID and name
     success: function( currNodeJSON ) {
 
-      // changes text to an input field with a value of the node's current name - need to get it from database because names aren't actually saved in the JIT tree ("text" just replaces it)
+      // changes text to an input field with a value of the node's current name - need to get it from database because names aren't actually saved in the SpaceTree ("text" just replaces it)
       jQuery("#"+currNodeJSON.id).html('<input type="text" value="'+currNodeJSON.name+'" />');
       // highlights text in input field
       jQuery("input").select();
@@ -317,7 +466,7 @@ function enableUpdateNode( node ) {
   });
 }
 
-// REST: updates node name in the database and, on success, in the JIT tree
+// REST: updates node name in the database and, on success, in the SpaceTree
 function updateNode( node, nodeName, doing ) {
   // the node's resource
   var resource = getNodeInfo( node, "resource" );
@@ -350,9 +499,9 @@ function updateNode( node, nodeName, doing ) {
   });
 };
 
-// REST: deletes node in the database and, on success, in the JIT tree.
+// REST: deletes node in the database and, on success, in the SpaceTree.
 // Condition is either "soft" or "hard": soft-delete updates the "deleted" flag in the database from false to true, while hard-delete deletes the entry in the database
-function deleteNode( node, condition ) {
+function deleteNode( node, condition, doing ) {
   // the node's resource
   var resource = getNodeInfo( node, "resource" );
   // the node's database ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
@@ -392,7 +541,7 @@ function deleteNode( node, condition ) {
       // selects the deleted node's parent (highlights and centers the tree), as if it were clicked
       st.onClick( parent_JSONid );
 
-      if( condition !== "hard" ) {
+      if( doing !== "undo" ) {
         // variables needed to undo the soft-deletion of this node
         lastAction = "delete";
         lastNode = node;
@@ -407,8 +556,14 @@ function deleteNode( node, condition ) {
 function undoLastAction() {
   if( !unDone ) { // if the last action isn't "undo"
     if( lastAction === "create" ) {
-      // hard-deletes the created node; reasoning is that the table shouldn't be cluttered with soft-deleted entries that have no children, since "undo" is only valid for one action without a page refresh
-      deleteNode( lastNode, "hard" );
+      // ensures a non-base FSD is not hard-deleted, as it was automatically created with a concept
+      if( lastNode._depth % 4 === 0 ) {  // if the node is at node depth 4, 8, or 12, etc.
+        deleteNode( lastNode, "soft", "undo" );
+      }
+      else {
+        // hard-deletes the created node; reasoning is that the table shouldn't be cluttered with soft-deleted entries that have no children, since "undo" is only valid for one action without a page refresh
+        deleteNode( lastNode, "hard", "undo" );
+      }
     }
     else if( lastAction === "update" ) {
       updateNode( lastNode, lastName, "undo" );
@@ -453,13 +608,11 @@ jQuery(document).keydown( function( event ) {
     case 45:  // Insert key
       // prevent default action of the event from happening (i.e. prevent Tab from moving focus)
       event.preventDefault();
-if( st.clickedNode._depth < 1 ) { // REMOVE CHECK WHEN IN DESIGNPAD; this check's here since an object can't be the parent of an object category (no recursion)
-    // only allow adding of a node if another node is not in editing mode
-    if( !inEditing ) {
-      // creates child node to the current (last clicked) node
-      createChildNode( st.clickedNode );
-    }
-}
+      // only allow adding of a node if another node is not in editing mode
+      if( !inEditing ) {
+        // creates child node to the current (last clicked) node
+        createChildNode( st.clickedNode );
+      }
       break;
 
     // adding sibling node with Enter, or updating entered node name
@@ -467,8 +620,8 @@ if( st.clickedNode._depth < 1 ) { // REMOVE CHECK WHEN IN DESIGNPAD; this check'
       // adding sibling node with Enter
       // only allow adding of a node if another node is not in editing mode
       if( !inEditing ) {
-        // only allow the sibling node to be added if the current (last clicked) node is not the base FSD node, which is the root node
-        if( st.clickedNode.id !== st.root ) {
+        // only allow the sibling node to be added if the current (last clicked) node is not a FSD node
+        if( (st.clickedNode.id !== st.root) && (st.clickedNode._depth % 4 !== 0) ) {  // if the node is not at node depth 0 (root), 4, and 8, etc.
           // creates sibling node to the current (last clicked) node
           createSiblingNode( st.clickedNode );
         }
@@ -550,32 +703,27 @@ if( st.clickedNode._depth < 1 ) { // REMOVE CHECK WHEN IN DESIGNPAD; this check'
     // only allow navigation if a node's not in editing mode
       if( !inEditing ) {
         if( st.clickedNode.id !== st.root ) { // if it's not the root node
-          // the current (last clicked) node's parent's resource
-          var parent_resource = getNodeInfo( st.clickedNode, "parent resource" );
-          // the current (last clicked) node's parent's ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
-          var parent_id = getParentNode( st.clickedNode ).id.slice(0,-4);
           // the current (last clicked) node's parent
           var parentNode = getParentNode( st.clickedNode );
 
-          // gets current (last clicked) node's parent's data - i.e. its children
-          jQuery.ajax( {
-            type: "GET",
-            url: "/"+parent_resource+"/"+parent_id+".json",  // need JSON to retrieve created node's data - i.e. its children
-            success: function( parentJSON ) {
-              // iterates through JSON's direct children
-              jQuery.each( parentJSON.children, function( i, v ) {
-                if( v.id === st.clickedNode.id ) {  // if the child's JSON ID matches the current (last clicked) node's JSON ID
-                  if( i > 0 ) { // ensure the child isn't the 1st one (0-based indexing)
-                    // selects the current (last clicked) node's previous sibling, which is its parent's i-th child (1-based indexing with current node as (i+1)-th child)
-                    st.onClick( parentNode.getSubnodes()[i].id );
-                    return;
-                  }
-                  else {
-                    // don't do anything if it's already the first child
-                    return;
-                  }
-                }
-              });
+          // stores current (last clicked) node's parent's direct children nodes into an array
+          var directChildren = new Array();
+          parentNode.eachSubnode( function(n) {
+            directChildren.push(n);
+          });
+
+          // iterates through current (last clicked) node's parent's direct children
+          jQuery.each( directChildren, function( i, v ) {
+            if( v.id === st.clickedNode.id ) {  // if the child's node ID matches the current (last clicked) node's node ID
+              if( i > 0 ) { // ensure the child isn't the first one (i is 0-based indexing)
+                // selects the current (last clicked) node's previous sibling, which is its parent's (i-1)-th child (current node is (i)-th child)
+                st.onClick( directChildren[i-1].id );
+                return; // break out of each() loop early
+              }
+              else {
+                // don't do anything if it's already the first child
+                return; // break out of each() loop early
+              }
             }
           });
         }
@@ -587,38 +735,35 @@ if( st.clickedNode._depth < 1 ) { // REMOVE CHECK WHEN IN DESIGNPAD; this check'
       // only allow navigation if a node's not in editing mode
       if( !inEditing ) {
         if( st.clickedNode.id !== st.root ) { // if it's not the root node
-          // the current (last clicked) node's parent's resource
-          var parent_resource = getNodeInfo( st.clickedNode, "parent resource" );
-          // the current (last clicked) node's parent's ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
-          var parent_id = getParentNode( st.clickedNode ).id.slice(0,-4);
           // the current (last clicked) node's parent
           var parentNode = getParentNode( st.clickedNode );
 
-          // counts current (last clicked) node's parent's children number (1-based "indexing")
+          // counts current (last clicked) node's parent's direct children nodes (count is 1-based "indexing"), and stores the direct children nodes into an array
           var count = 0;
+          var directChildren = new Array();
           parentNode.eachSubnode( function(n) {
             count++;
+            directChildren.push(n);
           });
+          // whether or not the child node is the next sibling; needed because directChildren[i+1] is not truly defined
+          var isNextSibling = false;
 
-          // gets current (last clicked) node's parent's data - i.e. its children
-          jQuery.ajax( {
-            type: "GET",
-            url: "/"+parent_resource+"/"+parent_id+".json",  // need JSON to retrieve created node's data - i.e. its children
-            success: function( parentJSON ) {
-              // iterates through JSON's direct children
-              jQuery.each( parentJSON.children, function( i, v ) {
-                if( v.id === st.clickedNode.id ) {  // if the child's JSON ID matches the current (last clicked) node's JSON ID
-                  if( i+1 < count ) { // ensure the child isn't the last one (0-based indexing)
-                    // selects the current (last clicked) node's next sibling, which is its parent's (i+2)-th child (1-based indexing with current node as (i+1)-th child)
-                    st.onClick( parentNode.getSubnodes()[i+2].id );
-                    return;
-                  }
-                  else {
-                    // don't do anything if it's already the first child
-                    return;
-                  }
-                }
-              });
+          // iterates through current (last clicked) node's parent's direct children
+          jQuery.each( directChildren, function( i, v ) {
+            if( v.id === st.clickedNode.id ) {  // if the child's node ID matches the current (last clicked) node's node ID
+              if( i < count ) { // ensure the child isn't the last one (i is 0-based indexing)
+                isNextSibling = true;
+                return true;  // return true to skip to next iteration
+              }
+              else {
+                // don't do anything if it's already the last child
+                return; // break out of each() loop early
+              }
+            }
+            if( isNextSibling ) { // if the child node is the next sibling
+              // selects the current (last clicked) node's next sibling
+              st.onClick( directChildren[i].id );
+              return; // break out of each() loop early
             }
           });
         }
@@ -664,11 +809,11 @@ if( st.clickedNode._depth < 1 ) { // REMOVE CHECK WHEN IN DESIGNPAD; this check'
   }
 });
 
-// renders the JIT tree with the JSON representation as a parameter
+// renders the SpaceTree with the JSON representation as a parameter
 //init data
 function initST( fsdJSON ) {
-alert("hi");
-  // assign a variable, with the value of the JSON representation, to be used when rendering the JIT tree
+
+  // assign a variable, with the value of the JSON representation, to be used when rendering the SpaceTree
   var treeJSON = fsdJSON;
 
   //init Spacetree

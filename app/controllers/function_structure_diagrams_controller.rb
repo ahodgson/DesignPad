@@ -27,6 +27,7 @@ class FunctionStructureDiagramsController < ApplicationController
     respond_to do |format|
       format.html # show.rhtml
       format.xml  { render :xml => @function_structure_diagram.to_xml }
+      format.json { render json: @function_structure_diagram }
     end
   end
 
@@ -55,11 +56,12 @@ class FunctionStructureDiagramsController < ApplicationController
     end
 
     respond_to do |format|
-      if @name.length>0 && @function_structure_diagram.update_attribute(:name, @name)        
-        flash[:notice] = 'FunctionStructureDiagram was successfully created.'
+      if @name.length>0 && @function_structure_diagram.update_attribute(:name, @name)
+        flash[:notice] = 'Function Structure Diagram was successfully created.'
         format.html { redirect_to function_structure_diagram_url(@function_structure_diagram) }
         format.xml  { head :created, :location => function_structure_diagram_url(@function_structure_diagram) }
         format.js #instant_create.rjs
+        format.json { render json: @function_structure_diagram, status: :created, location: @function_structure_diagram }
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @function_structure_diagram.errors.to_xml }
@@ -68,6 +70,7 @@ class FunctionStructureDiagramsController < ApplicationController
             page.fail_instant_create
           end
         end
+        format.json { render json: @function_structure_diagram.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -77,19 +80,31 @@ class FunctionStructureDiagramsController < ApplicationController
   def update
     @function_structure_diagram = FunctionStructureDiagram.find(params[:id])
 
-    respond_to do |format|
-      if @function_structure_diagram.update_attributes(params[:function_structure_diagram])
-        flash[:notice] = 'FunctionStructureDiagram was successfully updated.'
-        format.html { redirect_to :id=>session[:project_id], :action=>"edit", :controller=>"projects", :function_structure_diagram_id=>@function_structure_diagram.id }
-        format.xml  { head :ok }
-        format.js #update.rjs
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @function_structure_diagram.errors.to_xml }
-        format.js do
-          render :update do |page|
-            page.fail_instant_update
+    # check needed because project_id is nil when updating through the JIT SpaceTree
+    if not session[:project_id].nil?
+      respond_to do |format|
+        if @function_structure_diagram.update_attributes(params[:function_structure_diagram])
+          flash[:notice] = 'Function Structure Diagram was successfully updated.'
+          format.html { redirect_to :id=>session[:project_id], :action=>"edit", :controller=>"projects", :function_structure_diagram_id=>@function_structure_diagram.id }
+          format.xml  { head :ok }
+          format.js #update.rjs
+        else
+          format.html { render :action => "edit" }
+          format.xml  { render :xml => @function_structure_diagram.errors.to_xml }
+          format.js do
+            render :update do |page|
+              page.fail_instant_update
+            end
           end
+        end
+      end
+    # for the JIT SpaceTree
+    else
+      respond_to do |format|
+        if @function_structure_diagram.update_attributes(params[:function_structure_diagram])
+          format.html { redirect_to @function_structure_diagram, notice: 'Function Structure Diagram was successfully updated.' }
+        else
+          format.html { render action: "edit" }
         end
       end
     end
@@ -122,7 +137,7 @@ class FunctionStructureDiagramsController < ApplicationController
   def delete_picture
     @function_structure_diagram_id=params[:id]
     @function_structure_diagram=FunctionStructureDiagram.find(@function_structure_diagram_id)
-    
+
     respond_to do |format|
       if @function_structure_diagram.update_attribute(:picture, nil)
         flash[:notice]="Diagram has been deleted."
@@ -138,5 +153,5 @@ class FunctionStructureDiagramsController < ApplicationController
      @function_structure_diagram=FunctionStructureDiagram.find(params[:id])
      send_data(@function_structure_diagram.picture, :type=>'image/jpeg')
   end
-  
+
 end
