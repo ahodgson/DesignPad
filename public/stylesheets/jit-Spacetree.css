@@ -57,3 +57,9 @@
   background: -moz-linear-gradient(top,  #ededed,  #fff);
   filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#ffffff');
 }
+
+/*.node {
+  background: url("/images/overlay.png") repeat-x;
+  margin: 0;
+  padding: 0;
+}*/

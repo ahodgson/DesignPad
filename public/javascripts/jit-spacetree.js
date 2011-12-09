@@ -27,6 +27,8 @@ var inEditing = false;
 var unDone = false;
 // whether or not the Ctrl key is pressed down
 var ctrlDown = false;
+// the max length of each node's name (specified in the models)
+var NAME_MAX_LENGTH = 100;
 
 var labelType, useGradients, nativeTextSupport, animate;
 
@@ -45,16 +47,6 @@ var labelType, useGradients, nativeTextSupport, animate;
   useGradients = nativeCanvasSupport;
   animate = !(iStuff || !nativeCanvasSupport);
 })();
-
-var Log = {
-  elem: false,
-  write: function(text) {
-    if (!this.elem)
-      this.elem = document.getElementById('log');
-    this.elem.innerHTML = text;
-    this.elem.style.left = (500 - this.elem.offsetWidth / 2) + 'px';
-  }
-};
 
 
 // returns the requested information of a node (with an optional 3rd parameter of a value that needs to be set), depending on the node's depth
@@ -239,12 +231,8 @@ function createChildNode( node, doing ) {
                   }]
                 };
                 // adds a child node to the node
-                Log.write( "adding node..." );
                 st.addSubtree( newNode, "replot", {
-                  hideLabels: false,
-                  onComplete: function() {
-                    Log.write( "node added" );
-                  }
+                  hideLabels: false
                 });
 
                 // selects the new node (highlights and centers the tree), as if it were clicked
@@ -252,7 +240,7 @@ function createChildNode( node, doing ) {
 
                 if( doing !== "redo" ) {  // if the child node is not created in a redo; no need to enable editing if redo
                   // changes text to an input field with a value of the node's name
-                  jQuery("#"+child_JSONid).html('<input type="text" value="'+newNodeName+'" />');
+                  jQuery("#"+child_JSONid).html('<input type="text" value="'+newNodeName+'" maxlength="'+NAME_MAX_LENGTH+'" size="9" style="background-color:transparent; outline: none; border: none;" />');
                   // highlights text in input field
                   jQuery("input").select();
 
@@ -291,12 +279,8 @@ function createChildNode( node, doing ) {
               }]
             };
             // adds a child node to the node
-            Log.write( "adding node..." );
             st.addSubtree( newNode, "replot", {
-              hideLabels: false,
-              onComplete: function() {
-                Log.write( "node added" );
-              }
+              hideLabels: false
             });
 
             // selects the new node (highlights and centers the tree), as if it were clicked
@@ -304,7 +288,7 @@ function createChildNode( node, doing ) {
 
             if( doing !== "redo" ) {  // if the child node is not created in a redo; no need to enable editing if redo
               // changes text to an input field with a value of the node's name
-              jQuery("#"+newNodeJSON.id).html('<input type="text" value="'+newNodeName+'" />');
+              jQuery("#"+newNodeJSON.id).html('<input type="text" value="'+newNodeName+'" maxlength="'+NAME_MAX_LENGTH+'" size="9" style="background-color:transparent; outline: none; border: none;" />');
               // highlights text in input field
               jQuery("input").select();
 
@@ -359,9 +343,7 @@ function createChildNode( node, doing ) {
           type: "GET",
           url: "/"+rootResource+"/"+rootResource_id+".json",  // need JSON to retrieve restored node's parent's data - i.e. its children
           success: function( treeJSON ) {
-// NOTE: in DesignPad, ensure it's not slow to reload the ST
 
-// NOTE: need Log.write?
             //load json data
             st.loadJSON(treeJSON);
             //compute node positions and layout
@@ -408,19 +390,15 @@ function createSiblingNode( node ) {
         }]
       };
       // adds a child node to the node's parent
-      Log.write( "adding node..." );
       st.addSubtree( newNode, "replot", {
-        hideLabels: false,
-        onComplete: function() {
-          Log.write( "node added" );
-        }
+        hideLabels: false
       });
 
       // selects the new node (highlights and centers the tree), as if it were clicked
       st.onClick( newNodeJSON.id );
 
       // changes text to an input field with a value of the node's current name
-      jQuery("#"+newNodeJSON.id).html('<input type="text" value="'+newNodeName+'" />');
+      jQuery("#"+newNodeJSON.id).html('<input type="text" value="'+newNodeName+'" maxlength="'+NAME_MAX_LENGTH+'" size="9" style="background-color:transparent; outline: none; border: none;" />');
       // highlights text in input field
       jQuery("input").select();
 
@@ -450,7 +428,7 @@ function enableUpdateNode( node ) {
     success: function( currNodeJSON ) {
 
       // changes text to an input field with a value of the node's current name - need to get it from database because names aren't actually saved in the SpaceTree ("text" just replaces it)
-      jQuery("#"+currNodeJSON.id).html('<input type="text" value="'+currNodeJSON.name+'" />');
+      jQuery("#"+currNodeJSON.id).html('<input type="text" value="'+currNodeJSON.name+'" maxlength="'+NAME_MAX_LENGTH+'" size="9" style="background-color:transparent; outline: none; border: none;" />');
       // highlights text in input field
       jQuery("input").select();
 
@@ -528,12 +506,8 @@ function deleteNode( node, condition, doing ) {
     success: function() {
 
       // removes the node (and its children if it has them)
-      Log.write( "removing subtree..." );
       st.removeSubtree( node.id, true, "animate", { // "replot" doesn't work for an unknown reason, but duration is already set to 0 to disable animations
-        hideLabels: false,
-        onComplete: function() {
-          Log.write( "subtree removed" );
-        }
+        hideLabels: false
       });
 
       // the node's parent's JSON ID
@@ -692,6 +666,27 @@ jQuery(document).keydown( function( event ) {
     // only allow navigation if a node's not in editing mode
       if( !inEditing ) {
         if( st.clickedNode.anySubnode("exist") ) {  // if it has any children
+          // expand node if it's collapsed
+          if( st.clickedNode.collapsed ) {  // if the node is collapsed
+            // stores the current node's collapsed children nodes into an array
+            var collapsedChildren = new Array();
+            jQuery.each( st.clickedNode.getSubnodes(1), function( i, v ) {  // starting from its first child, not itself (as getSubnodes() would do)
+              if( v.collapsed ) {
+                collapsedChildren.push( v );
+                v.collapsed = false;
+              }
+            });
+
+            st.op.expand( st.clickedNode ); // expand it; node is set to not collapsed
+
+            // if there were collapsed children nodes, re-collapse the children that were previously set to collapse, as expanding the current node had expanded all its children too
+            if( collapsedChildren.length ) {
+              jQuery.each( collapsedChildren, function( i, v ) {
+                st.op.contract( v );
+              });
+            }
+          }
+
           // selects first child
           st.onClick( st.clickedNode.getSubnodes()[1].id );
         }
@@ -708,8 +703,8 @@ jQuery(document).keydown( function( event ) {
 
           // stores current (last clicked) node's parent's direct children nodes into an array
           var directChildren = new Array();
-          parentNode.eachSubnode( function(n) {
-            directChildren.push(n);
+          parentNode.eachSubnode( function( n ) {
+            directChildren.push( n );
           });
 
           // iterates through current (last clicked) node's parent's direct children
@@ -741,9 +736,9 @@ jQuery(document).keydown( function( event ) {
           // counts current (last clicked) node's parent's direct children nodes (count is 1-based "indexing"), and stores the direct children nodes into an array
           var count = 0;
           var directChildren = new Array();
-          parentNode.eachSubnode( function(n) {
+          parentNode.eachSubnode( function( n ) {
             count++;
-            directChildren.push(n);
+            directChildren.push( n );
           });
           // whether or not the child node is the next sibling; needed because directChildren[i+1] is not truly defined
           var isNextSibling = false;
@@ -816,6 +811,37 @@ function initST( fsdJSON ) {
   // assign a variable, with the value of the JSON representation, to be used when rendering the SpaceTree
   var treeJSON = fsdJSON;
 
+  // Render the node with rounded corners and a border
+  $jit.ST.Plot.NodeTypes.implement({
+    'round-stroke-rect': {
+      'render': function( node, canvas ) {
+        var width = node.getData('width'), height = node.getData('height');
+        var pos = node.pos.getc(true);
+        var algnPos = this.getAlignedPos(pos, width, height);
+        var ctx = canvas.getCtx(), ort = this.config.orientation;
+        ctx.beginPath();
+
+        var r = 6;  // corner radius
+        var x = algnPos.x;
+        var y = algnPos.y;
+        var h = height;
+        var w = width;
+
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.fill();
+        ctx.stroke(); // border
+      }
+    }
+  });
+
   //init Spacetree
   //Create a new ST instance
   st = new $jit.ST({
@@ -826,7 +852,7 @@ function initST( fsdJSON ) {
     //set animation transition type
     transition: $jit.Trans.Quart.easeInOut,
     //set distance between node and its children
-    levelDistance: 50,
+    levelDistance: 30,
     //enable panning
     Navigation: {
       enable:true,
@@ -836,21 +862,21 @@ function initST( fsdJSON ) {
     //set overridable=true for styling individual
     //nodes or edges
     Node: {
-      height: 20,
-      width: 60,
-      type: 'rectangle',
-      color: '#aaa',
+      height: 30,
+      width: 90,
+      autoHeight: true,
+      // autoWidth: true,
+      type: 'round-stroke-rect',
+      // canvas specific styles
+      CanvasStyles: {
+        strokeStyle: '#808080', // grey border, not used, but still needs to be specified here or border won't render
+        lineWidth: 1  // border width
+      },
       overridable: true
     },
     Edge: {
       type: 'bezier',
       overridable: true
-    },
-    onBeforeCompute: function(node) {
-      Log.write("loading " + node.name);
-    },
-    onAfterCompute: function() {
-      Log.write("done");
     },
     //This method is called on DOM label creation.
     //Use this method to add event handlers and styles to
@@ -863,13 +889,15 @@ function initST( fsdJSON ) {
       };
       //set label styles
       var style = label.style;
-      style.width = 60 + 'px';
-      style.height = 17 + 'px';
+      style.width = 90 + 'px';
+      // style.height = 30 + 'px';
       style.cursor = 'pointer';
-      style.color = '#333';
-      style.fontSize = '0.8em';
+      style.color = '#000';
+      style.fontSize = '12px';
       style.textAlign= 'center';
-      style.paddingTop = '1px';
+      style.paddingTop = '3px';
+      style.paddingBottom = '3px';
+      style.wordWrap = 'break-word';
     },
     //This method is called right before plotting
     //a node. It's useful for changing an individual node
@@ -881,23 +909,37 @@ function initST( fsdJSON ) {
       //root node and the selected node.
       if (node.selected) {
         if( node.id === st.clickedNode.id ) { // if it's the current (last clicked) node (= last node in path)
-          node.data.$color = "#f77";  // red
+          node.data.$color = "#FF7F00";  // medium orange
         }
         else {
-          node.data.$color = "#ff7";
+          node.data.$color = "#FF9F40"; // light orange
         }
+
+        node.setCanvasStyle('strokeStyle', '#A65200');  // orange border if selected node
       }
       else {
-        delete node.data.$color;
-        //if the node belongs to the last plotted level
-        if(!node.anySubnode("exist")) {
-          //count children number
-          var count = 0;
-          node.eachSubnode(function(n) { count++; });
-          //assign a node color based on
-          //how many children it has
-          node.data.$color = ['#aaa', '#baa', '#caa', '#daa', '#eaa', '#faa'][count];
+        if( (node.id === st.root) || (node._depth % 4 === 0) ) {  // if the node is a Function Structure Diagram
+          node.data.$color = "#206676"; // darkest blue
         }
+        else if( node._depth % 4 === 1 ) {  // if the node is a Function
+          node.data.$color = "#04819E";
+        }
+        else if( node._depth % 4 === 2 ) {  // if the node is a Concept Category
+          node.data.$color = "#38B2CE";
+        }
+        else if( node._depth % 4 === 3 ) {  // if the node is a Concept
+          node.data.$color = "#60B9CE";  // lightest blue
+        }
+
+        node.setCanvasStyle('strokeStyle', '#015367');  // blue border if not selected node
+      }
+
+      // indicate that a node is collapsed (purposely, by the user) with a white font colour
+      if( node.collapsed ) {
+        jQuery("#"+node.id).css('color', '#FFF');
+      }
+      else {
+        jQuery("#"+node.id).css('color', '#000');
       }
     },
     //This method is called right before plotting
@@ -907,12 +949,13 @@ function initST( fsdJSON ) {
     //override the Edge global style properties.
     onBeforePlotLine: function(adj) {
       if (adj.nodeFrom.selected && adj.nodeTo.selected) {
-        adj.data.$color = "#eed";
+        adj.data.$color = "#A65200";  // orange connector
         adj.data.$lineWidth = 3;
       }
       else {
         delete adj.data.$color;
         delete adj.data.$lineWidth;
+        adj.data.$color = "#015367";  // blue connector
       }
     },
     Events: {
@@ -928,13 +971,45 @@ function initST( fsdJSON ) {
           }
         }
       },
-      // handles click that saves node name, for if the user edits a node's name but clicks elsewhere instead of pressing Enter to save
+      // handles click that saves node name, for if the user edits a node's name but clicks elsewhere instead of pressing Enter to save; also handles expansion/contraction of a node
       onClick: function( node, eventInfo, e ) {
         if( inEditing ) { // if a node is in editing mode
           if( node.id !== st.clickedNode.id ) {  // if user clicks anywhere except for the current (last clicked) node
             // updates the current (last clicked) node's name
             updateNode( st.clickedNode, jQuery("input").val() );
           }
+        }
+        else {
+          if( node.id === st.clickedNode.id ) { // if user clicks the current (last clicked) node
+            if( node.collapsed ) {  // if the node is collapsed
+              // stores the current node's collapsed children nodes into an array
+              var collapsedChildren = new Array();
+              jQuery.each( node.getSubnodes(1), function( i, v ) {  // starting from its first child, not itself (as getSubnodes() would do)
+                if( v.collapsed ) {
+                  collapsedChildren.push( v );
+                  v.collapsed = false;
+                }
+              });
+
+              st.op.expand( node ); // expand it; node is set to not collapsed
+
+              // if there were collapsed children nodes, re-collapse the children that were previously set to collapse, as expanding the current node had expanded all its children too
+              if( collapsedChildren.length ) {
+                jQuery.each( collapsedChildren, function( i, v ) {
+                  st.op.contract( v );
+                });
+              }
+            }
+            else {  // if the node is not collapsed
+              st.op.contract( node ); // collapse it; node is set to collapsed
+            }
+          }
+          // Note: uncomment else statement below if you want to automatically expand, upon a click, a non-current node that was set to collapsed before
+          // else {
+            // if( node.collapsed ) {  // if the node is collapsed
+              // st.op.expand( node ); // expand it; node is set to not collapsed
+            // }
+          // }
         }
       }
     }

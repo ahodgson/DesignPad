@@ -20,9 +20,9 @@
       <img alt="" src="/images/wait.gif" />
     </div>
     <div id="project_tree_operations">
-      <%= button_to_function "Refresh", "$('project_tree_wait_icon').style.display=''; #{remote_function({:url=>{:controller=>"projects", :action=>"refresh", :id=>project.id}})}" %>
-      <button id="fold_button" type="button" onclick="foldAll($('<%= project.id.to_s %>_root_ul'))">fold all</button>
-      <button id="unfold_button" type="button" onclick="unfoldAll($('<%= project.id.to_s %>_root_ul'))">unfold all</button>
+      <!--<%= button_to_function "Refresh", "$('project_tree_wait_icon').style.display=''; #{remote_function({:url=>{:controller=>"projects", :action=>"refresh", :id=>project.id}})}" %>-->
+      <button id="fold_button" type="button" onclick="foldAll($('<%= project.id.to_s %>_root_ul'))">Collapse All</button>
+      <button id="unfold_button" type="button" onclick="unfoldAll($('<%= project.id.to_s %>_root_ul'))">Expand All</button>
     </div>
 
   </fieldset>

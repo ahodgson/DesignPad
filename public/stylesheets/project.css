@@ -21,6 +21,10 @@
 
 
 /*==============================   Title   ==================================*/
+#project_name{
+  font-size: 24px;
+}
+
 .project_name{
   float: left;
 }
@@ -72,7 +76,7 @@
   white-space: nowrap;
 }
 #new_known_object{
-  
+
   height: 200px;
   width: 300px;
   border: 1px solid black;
@@ -84,7 +88,6 @@
 #project_tree_area fieldset{
   float: left;
   width: 320px;
-  height: 500px;
   white-space: nowrap;
 }
 #project_tree_area ul{
@@ -94,14 +97,16 @@
 #tree{
   background-color: white;
   width: 300px;
-  height: 450px;
-  margin: 10px 11px 10px 9px;
+  height: 500px;
+  margin: 10px 11px 0px 9px;
   padding: 0;
   overflow: auto;
   border: 1px solid gray;
 }
 #project_tree_operations{
   float: right;
+  margin: 0;
+  padding-right: 6px;
 }
 
 .wait_icon img{
@@ -119,49 +124,49 @@
   color: green;
 }
 .project_ul{
-  
+
 }
 
 .function_structure_diagram_li{
-  
+
 }
 .function_structure_diagram_list_title{
   color: navy;
 }
 .function_structure_diagram_ul{
-  
+
 }
 
 .function_li{
-  
+
 }
 .function_list_title{
   color: navy;
-  font-weight: bold; 
+  font-weight: bold;
 }
 .function_ul{
-  
+
 }
 
 .concept_category_li{
-  
+
 }
 .concept_category_list_title{
   color: black;
 }
 .concept_category_ul{
-  
+
 }
 
 .concept_li{
-  
+
 }
 .concept_list_title{
   color: black;
-  font-weight: bold; 
+  font-weight: bold;
 }
 .concept_ul{
-  
+
 }
 .concept_list_title: hover{
   cursor: move;
@@ -207,15 +212,14 @@
 #project_view_area fieldset{
   float: left;
   width: 620px;
-  height: 550px;
-  white-space: nowrap;
+  /*white-space: nowrap;*/
 }
 
 #project_view_content{
   background-color: white;
   width: 600px;
-  height: 450px;
-  margin: 10px 11px 10px 9px;
+  height: 500px;
+  margin: 10px 11px 0px 9px;
   padding: 0;
   border: 1px solid gray;
 
@@ -228,21 +232,21 @@
 }
 #project_view_content img{
 /*  width: 620px; */
-  height: 450px;
+  height: 500px;
   width: 600px;
 }
 
 #project_view_clue{
   float: left;
-  margin-top: 15px;
-  margin-left: 10px;
+  margin: 0;
+  padding: 3px 0px 0px 10px;
   font: bold;
 }
 
 #project_view_operations{
   float: right;
-  margin-top: 15px;
-  margin-right: 5px;
+  margin: 0;
+  padding: 3px 10px 0px 0px;
 }
 #project_view_operations #uploading_form{
   display: inline-block;
@@ -274,7 +278,6 @@
 #known_objects_list_area fieldset{
   float: left;
   width: 120px;
-  height: 500px;
   white-space: nowrap;
 }
 #known_objects_list_area ul{
@@ -285,8 +288,8 @@
   text-align: center;
   background-color: white;
   width: 100px;
-  height: 450px;
-  margin: 10px 11px 10px 9px;
+  height: 500px;
+  margin: 10px 11px 0px 9px;
   padding: 0;
   overflow: auto;
   border: 1px solid gray;
@@ -297,8 +300,8 @@
 
 #known_objects_list_operations{
   float: right;
-  margin-top: 15px;
-  margin-right: 5px;
+  margin: 0;
+  padding: 3px 10px 0px 0px;
 }
 
 /*
@@ -372,9 +375,9 @@
   position: absolute;
   z-index: 1000;
   display: none;
-  
+
   background-color: navy;
-  font-size: small;
+  font-size: 12px;
   font-weight: bold;
   border: 1px gray solid;
   color: white;
@@ -394,7 +397,7 @@
   display: none;
 
   background-color: navy;
-  font-size: small;
+  font-size: 12px;
   font-weight: bold;
   border: 1px gray solid;
   color: white;

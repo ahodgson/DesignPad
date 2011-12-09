@@ -25,7 +25,7 @@ class FunctionStructureDiagramsController < ApplicationController
     @function_structure_diagram = FunctionStructureDiagram.find(params[:id])
 
     respond_to do |format|
-      format.html # show.rhtml
+      format.html { render :layout => false } # show.rhtml
       format.xml  { render :xml => @function_structure_diagram.to_xml }
       format.json { render json: @function_structure_diagram }
     end

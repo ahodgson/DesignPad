@@ -4,7 +4,11 @@
   }
 </style>
 
-<span class="project_name"><h2>Project: <%= link_to @title, edit_project_path(@project) %></h2></span>
+<h2>
+  <span id="project_name" class="project_name">
+    Project: <%= link_to @title, edit_project_path(@project) %>
+  </span>
+</h2>
 
 <span class="project_delete_link">
   <% if @project.user==@user %>
@@ -14,7 +18,7 @@
 
 <br clear="all" />
 <dl>
-  <dt>Description:</dt>
+  <dt><b>Description:</b></dt>
   <dd><%= @project.description %></dd>
 </dl>
 
@@ -23,7 +27,7 @@
 <div id="projet_show_left_column">
   <%= render :partial=>"known_objects/known_objects_list", :locals=>{:known_objects=>@known_objects, :function_structure_diagram_id=>@function_structure_diagram.id} %>
   <%= render :partial=>"functions/functions_list", :locals=>{:functions=>@functions, :function_structure_diagram_id=>@function_structure_diagram.id} %>
-  
+
   <div id="new_known_object"></div>
   <div id="edit_known_object"></div>
   <div id="new_function"></div>
@@ -35,7 +39,7 @@
     <legend>Function Structure Diagram</legend>
     <div id="project_view_content">
       <%= image_for(@function_structure_diagram, "function_structure_diagram") %>
-    </div>        
+    </div>
   </fieldset>
 </div>
 

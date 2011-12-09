@@ -22,6 +22,10 @@ THE SOFTWARE.
  */
  (function () {
 
+// Carrie Lai's offset hack: used to remove the strange extra 30 px on the right and bottom sides from the label of the rectangular node when autoHeight is used
+var hackWidth = 30;
+var hackHeight = 24;  // 30 - (style.paddingTop + style.paddingBottom)
+
 /*
   File: Core.js
 
@@ -6192,8 +6196,7 @@ var NodeHelper = {
     (end code)
     */
     'render': function(type, pos, width, height, canvas){
-      canvas.getCtx()[type + "Rect"](pos.x - width / 2, pos.y - height / 2,
-                                      width, height);
+      canvas.getCtx()[type + "Rect"](pos.x - width / 2, pos.y - height / 2, width, height);
     },
     /*
     Method: contains
@@ -8550,9 +8553,9 @@ $jit.ST= (function() {
           var $ST = $jit.ST;
 
           var config= {
-                levelsToShow: 100,  // sets number of levels to show for a subtree; set to a big number to have all nodes expanded and appear by default, as Nicolas Garcia Belmonte suggested in http://groups.google.com/group/javascript-information-visualization-toolkit/browse_thread/thread/1777f009e1bc4fca
+                levelsToShow: 100,  // sets number of levels to show after the selected node; set to a big number to have all nodes expanded and appear by default, as Nicolas Garcia Belmonte suggested in http://groups.google.com/group/javascript-information-visualization-toolkit/browse_thread/thread/1777f009e1bc4fca
                 levelDistance: 30,
-                constrained: false, // shows entire tree when loaded
+                constrained: true, // false shows all paths, whether or not they are in the selected node's path
                 Node: {
                   type: 'rectangle'
                 },
@@ -9728,8 +9731,8 @@ $jit.ST.Label.DOM = new Class({
         } else throw "align: not implemented";
 
         var style = tag.style;
-        style.left = labelPos.x + 'px';
-        style.top  = labelPos.y + 'px';
+        style.left = labelPos.x + hackWidth/2 + 'px';
+        style.top  = labelPos.y + hackHeight/2 + 'px';
         style.display = this.fitsInCanvas(labelPos, canvas)? '' : 'none';
         controller.onPlaceLabel(tag, node);
     }

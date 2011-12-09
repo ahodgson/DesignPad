@@ -24,7 +24,7 @@ class ConceptCategory < ActiveRecord::Base
   ICON_PATH = '/images/concept_category.jpg'
 
   # validations
-  validates_uniqueness_of :name, :scope => [:function_id]
+  # validates_uniqueness_of :name, :scope => [:function_id] # not necessary
   validates_length_of :name, :within=>NAME_RANGE
 
   # Clear a concept category, therefore make all its concepts unclassified
@@ -37,7 +37,7 @@ class ConceptCategory < ActiveRecord::Base
       end
     end
   end
-  
+
   # defines the JSON representation of the concept category objects to be rendered in the JIT SpaceTree
   def as_json( options={} )
     { :id => id.to_s + "_cat", :name => name, :data => description, :children => concepts }

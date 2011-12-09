@@ -5,18 +5,24 @@ page.refresh_available_objects(@function_structure_diagram, @entity_model_name)
 page.replace_html :project_view_legend, @function_structure_diagram.name
 
 # Show uploading link
-page.replace_html :project_view_operations, 
-                  :partial=>'function_structure_diagrams/view_operation_bar',
-                  :locals=>{:function_structure_diagram=>@function_structure_diagram}
-                
-page.hide :uploading_form
+# page.replace_html :project_view_operations,
+                  # :partial=>'function_structure_diagrams/view_operation_bar',
+                  # :locals=>{:function_structure_diagram=>@function_structure_diagram}
+
+# page.hide :uploading_form
 
 # Show diagram
-page.replace_html :project_view_content, image_for(@function_structure_diagram, "function_structure_diagram")
+# page.replace_html :project_view_content, image_for(@function_structure_diagram, "function_structure_diagram")
 
-if @function_structure_diagram.has_picture?
-  page.replace_html :project_view_clue, link_to("(delete)", {:controller=>"function_structure_diagrams", :action=>"delete_picture", :id=>@function_structure_diagram}, :confirm=>'Are you sure to delete?')
-else
-  page.replace_html :project_view_clue, "No image found."
-  page.replace_html :project_view_content, :partial=>"function_structure_diagrams/spacetree", :locals=>{:function_structure_diagram=>@function_structure_diagram}
-end
+# if @function_structure_diagram.has_picture?
+  # page.replace_html :project_view_clue, link_to("(delete)", {:controller=>"function_structure_diagrams", :action=>"delete_picture", :id=>@function_structure_diagram}, :confirm=>'Are you sure to delete?')
+# else
+  # page.replace_html :project_view_clue, "No image found."
+  # page.replace_html :project_view_content, :partial=>"function_structure_diagrams/spacetree", :locals=>{:function_structure_diagram=>@function_structure_diagram}
+# end
+
+page.replace_html :project_view_clue, "Export as Image"
+
+page.replace_html :project_view_operations, link_to("View/Edit Fullscreen (Opens New Window)", {:controller=>"function_structure_diagrams", :action=>"show", :id=>@function_structure_diagram}, :target=>"_blank")
+
+# page.replace_html :project_view_operations, link_to("View/Edit Fullscreen", "#", :class=>"basic")

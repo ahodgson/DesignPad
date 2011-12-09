@@ -11,10 +11,10 @@ class Project < ActiveRecord::Base
 
   # Length ranges
   NAME_MIN_LENGTH = 1
-  NAME_MAX_LENGTH = 100
+  NAME_MAX_LENGTH = 115 # changed from 100 to 120 because of a project's base FSD's initial defaulted name, which includes the project name
   DESCRIPTION_MIN_LENGTH = 5
   DESCRIPTION_MAX_LENGTH = 100
-  NAME_RANGE = NAME_MIN_LENGTH..NAME_MAX_LENGTH  
+  NAME_RANGE = NAME_MIN_LENGTH..NAME_MAX_LENGTH
   DESCRIPTION_RANGE = DESCRIPTION_MIN_LENGTH..DESCRIPTION_MAX_LENGTH
 
   # Html sizes
@@ -54,8 +54,8 @@ class Project < ActiveRecord::Base
     function_structure_diagram=self.function_structure_diagram
     !(function_structure_diagram.nil? || function_structure_diagram.name.nil?)
   end
-  
+
   def as_json
-	
+
   end
 end
