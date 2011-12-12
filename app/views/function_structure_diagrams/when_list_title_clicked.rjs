@@ -18,7 +18,7 @@ page.replace_html :project_view_legend, @function_structure_diagram.name
   # page.replace_html :project_view_clue, link_to("(delete)", {:controller=>"function_structure_diagrams", :action=>"delete_picture", :id=>@function_structure_diagram}, :confirm=>'Are you sure to delete?')
 # else
   # page.replace_html :project_view_clue, "No image found."
-  # page.replace_html :project_view_content, :partial=>"function_structure_diagrams/spacetree", :locals=>{:function_structure_diagram=>@function_structure_diagram}
+  page.replace_html :project_view_content, :partial=>"function_structure_diagrams/spacetree", :locals=>{:function_structure_diagram=>@function_structure_diagram}
 # end
 
 page.replace_html :project_view_clue, "Export as Image"
