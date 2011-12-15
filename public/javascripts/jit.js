@@ -22,9 +22,9 @@ THE SOFTWARE.
  */
  (function () {
 
-// Carrie Lai's offset hack: used to remove the strange extra 30 px on the right and bottom sides from the label of the rectangular node when autoHeight is used
-var hackWidth = 30;
-var hackHeight = 24;  // 30 - (style.paddingTop + style.paddingBottom)
+// Carrie's offset hack: used to remove the extra (jit-Spacetree.css' .jit-autoadjust-label padding * 2) px on the right and bottom sides from the label of the rectangular node when autoHeight is used
+var hackWidth = 30; // padding*2
+var hackHeight = 24;  // padding*2 - (style.paddingTop + style.paddingBottom)
 
 /*
   File: Core.js

@@ -12,14 +12,26 @@
 }
 
 #function_description fieldset{
-  max-width: 580px;
+  /*max-width: 580px;
   max-height: 152px;
-  margin: 10px 11px 10px 9px;
+  margin: 10px 11px 10px 9px;*/
+  float: left;
+  height: 50%;
+  max-width: 500px;
+  margin: 10px 10px 0px 10px;
+  padding: 10px;
+  /*white-space: nowrap;*/
 }
 #function_short_form fieldset{
-  max-width: 580px;
+  /*max-width: 580px;
   max-height: 164px;
-  margin: 10px 11px 0px 9px;
+  margin: 10px 11px 0px 9px;*/
+  float: left;
+  height: 50%;
+  max-width: 500px;
+  margin: 10px 10px 0px 10px;
+  padding: 10px;
+  /*white-space: nowrap;*/
 }
 
 #function_description_clue, #function_short_form_clue{

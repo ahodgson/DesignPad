@@ -6,7 +6,7 @@ html {
 body {
   height: 100%;
   width: 100%;
-  background-color: #eee; /* light gray in projects/edit page - needed because of JIT's bug of the label at page bottom */
+  background-color: #fff; /* white in fullscreen - needed because of JIT's bug of the label at page bottom */
 }
 
 #infovis {

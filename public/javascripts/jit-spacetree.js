@@ -23,15 +23,39 @@ var st;
 var lastAction, lastNode, lastParentNode, lastName, newName;
 // whether or not a node is currently in editing mode, for editing a node's name
 var inEditing = false;
-// whether or not the undo action was done
-var unDone = false;
+// the last action and last node used in an undo
+var undoneAction = null, undoneNode = null;
+// whether or not the redo action can be done (i.e. the last done action was undo, not redo)
+var canRedo = false;
 // whether or not the Ctrl key is pressed down
 var ctrlDown = false;
+// whether or not the Shift key is pressed down
+var shiftDown = false;
 // the max length of each node's name (specified in the models)
 var NAME_MAX_LENGTH = 100;
 
 var labelType, useGradients, nativeTextSupport, animate;
 
+
+/*
+ * Functions
+ *
+ * Split into the following categories:
+ *
+ * PROJECT TREE AREA UPDATING
+   - for the projects/edit page
+   - updates project tree area as SpaceTree updates
+ * LINK CLICK HANDLER
+   - for the fullscreen FSD (function_structure_diagrams/show) page
+   - uses ACTIONS ON CLICKED NODE
+ * KEY PRESS HANDLER
+   - uses ACTIONS ON CLICKED NODE
+ * ACTIONS ON CLICKED NODE
+   - uses REST FUNCTIONS
+ * REST FUNCTIONS
+ * HELPER FUNCTIONS FOR REST AND SPACETREE
+ * SPACETREE
+ */
 
 (function() {
   var ua = navigator.userAgent,
@@ -48,131 +72,419 @@ var labelType, useGradients, nativeTextSupport, animate;
   animate = !(iStuff || !nativeCanvasSupport);
 })();
 
+/* PROJECT TREE AREA UPDATING */
 
-// returns the requested information of a node (with an optional 3rd parameter of a value that needs to be set), depending on the node's depth
-function getNodeInfo( node, info, value ) {
-  // the node is a Function Structure Diagram
-  if( (node.id === st.root) || (node._depth % 4 === 0) ) {  // if the node is at node depth 0 (root), 4, or 8, etc.
-    if( info === "resource" ) {
-      return "function_structure_diagrams";
+// "when_list_title_clicked" click handler for list titles added by the SpaceTree to the project tree area - using a "new_list_title" class to prevent conflict with Prototype
+jQuery(".new_list_title").live( "click", function() {
+  // the node's list_title dom ID in the project tree area
+  var id_full = jQuery(this).attr("id");
+
+  // the numeric and resource part of the dom ID; gets by removing the last 11 characters ("_list_title") of the dom ID to take only these two significant parts
+  var id_significant = id_full.slice(0,-11);
+  // the resource part of the dom ID - returned in an array where each word of the resource (split by "_" in the dom ID) is a value
+  var id_resource = id_significant.match(/[a-z]+/g);
+  // the node's resource (pluralized form of id_resource)
+  var resource;
+  if( id_resource.length > 1 ) {  // if more than one value in the array (for function_structure_diagram and concept_category)
+    // joins words (array values) into a string with an underscore between them
+    id_resource = id_resource.join("_");
+
+    // pluralizes the resource; note concept_category in plural ends in "ies" instead of "s"
+    if( id_resource === "concept_category" ) {
+      resource = id_resource.slice(0,-1) + "ies";
     }
-    else if( info === "resource name" ) {
-      return "Function Structure Diagram";
-    }
-    else if( info === "child resource" ) {
-      return "functions";
-    }
-    else if( info === "child resource name" ) {
-      return "Function";
-    }
-    else if( info === "post child data" ) {
-      return { "function":{ "name":value, "function_structure_diagram_id":node.id.slice(0,-4) } };
-    }
-    // no "else if( info === "post sibling data" )"
-    else if( info === "put data" ) {
-      return { "function_structure_diagram":{ "name":value } };
-    }
-    else if( info === "delete data" ) {
-      return { "function_structure_diagram":{ "deleted":value } };
+    else {
+      resource = id_resource + "s";
     }
   }
+  else {  // for (function and concept)
+    // takes the only value in the array
+    id_resource = id_resource[0];
 
-  // the node is a Function
-  else if( node._depth % 4 === 1 ) {  // if the node is at node depth 1, 5, or 9, etc.
-    if( info === "resource" ) {
-      return "functions";
-    }
-    else if( info === "resource name" ) {
-      return "Function";
-    }
-    else if( info === "child resource" ) {
-      return "concept_categories";
-    }
-    else if( info === "child resource name" ) {
-      return "Concept Category";
-    }
-    else if( info === "post child data" ) {
-      return { "concept_category":{ "name":value, "function_id":node.id.slice(0,-4) } };
-    }
-    else if( info === "post sibling data" ) {
-      return { "function":{ "name":"New Function", "function_structure_diagram_id":value } };
-    }
-    else if( info === "put data" ) {
-      return { "function":{ "name":value } };
-    }
-    else if( info === "delete data" ) {
-      return { "function":{ "deleted":value } };
-    }
+    // pluralizes the resource
+    resource = id_resource + "s";
   }
 
-  // the node is a Concept Category
-  else if( node._depth % 4 === 2 ) {  // if the node is at node depth 2, 6, or 10, etc.
-    if( info === "resource" ) {
-      return "concept_categories";
-    }
-    else if( info === "resource name" ) {
-      return "Concept Category";
-    }
-    else if( info === "child resource" ) {
-      return "concepts";
-    }
-    else if( info === "child resource name" ) {
-      return "Concept";
-    }
-    else if( info === "post child data" ) {
-      return { "concept":{ "name":value, "concept_category_id":node.id.slice(0,-4) } };
-    }
-    else if( info === "post sibling data" ) {
-      return { "concept_category":{ "name":"New Concept Category", "function_id":value } };
-    }
-    else if( info === "put data" ) {
-      return { "concept_category":{ "name":value } };
-    }
-    else if( info === "delete data" ) {
-      return { "concept_category":{ "deleted":value } };
-    }
-  }
+  // the numeric part of the dom ID, which is the node's database ID - returned in an array [as the only value with key 0]
+  var id_numeric = id_full.match(/[0-9]+/g);
 
-  // the node is a Concept
-  else if( node._depth % 4 === 3 ) {  // if the node is at node depth 3, 7, or 11, etc.
-    if( info === "resource" ) {
-      return "concepts";
-    }
-    else if( info === "resource name" ) {
-      return "Concept";
-    }
-    else if( info === "child resource" ) {
-      return "function_structure_diagrams";
-    }
-    else if( info === "child resource name" ) {
-      return "Function Structure Diagram";
-    }
-    else if( info === "post child data" ) { // actually "put child data" to update name
-      return { "function_structure_diagram":{ "name":value, "deleted":false } }; // no parent ID needed; must set deleted to false in case it was soft-deleted before
-    }
-    else if( info === "post sibling data" ) {
-      return { "concept":{ "name":"New Concept", "concept_category_id":value } };
-    }
-    else if( info === "put data" ) {
-      return { "concept":{ "name":value } };
-    }
-    else if( info === "delete data" ) {
-      return { "concept":{ "deleted":value } };
-    }
-  }
-};
+  // call on when_list_title_clicked function
+  jQuery.ajax( {
+    type: "POST",
+    url: "/"+resource+"/when_list_title_clicked?"+id_resource+"_id="+id_numeric[0]
+  });
 
-// returns a node's parent node
-function getParentNode( node ) {
-  if( node.id !== st.root ) { // if the node isn't the root node
-    // an array of the node's parent nodes
-    var parents = node.getParents();
-    // the number of parent nodes the node has
-    var numParents = parents.length;
-    // returns the node's parent node, which is the last one in the array
-    return parents[numParents-1];
+  // de-select all list titles in the project tree area
+  jQuery(".list_title").removeClass("selected_list_title");
+  // select clicked list title in the project tree area
+  jQuery(this).addClass("selected_list_title");
+});
+
+// "toggleList" click handler for expansion images added by the SpaceTree to the project tree area - using a "new_expansion_img" class to prevent conflict with Prototype
+jQuery(".new_expansion_img").live( "click", function() {
+  // the node's parent's parent's li dom ID in the project tree area
+  var id_full = jQuery(this).parent().parent().attr("id");
+
+  // the numeric part of the dom ID, which is the node's database ID - returned in an array [as the only value with key 0]
+  var id_numeric = id_full.match(/[0-9]+/g);
+
+  // the resource part of the dom ID, which is the node's database ID - returned in an array [as the only value with key 0]
+  var id_resource = id_full.match(/[a-z_]+/g);
+
+  // toggle the expansion (function in application.js)
+  toggleList( id_numeric[0] + id_resource[0] );
+});
+
+/* LINK CLICK HANDLER */
+
+jQuery("#create_child").live( "click", function() {
+  create_child();
+});
+jQuery("#create_sibling").live( "click", function() {
+  // only allow adding of a node if another node is not in editing mode
+  if( !inEditing ) {
+    create_sibling();
   }
-};
+});
+jQuery("#update_name").live( "click", function() {
+  update_name();
+});
+jQuery("#delete_node").live( "click", function() {
+  delete_node();
+});
+jQuery("#undo_action").live( "click", function() {
+  undoLastAction();
+});
+jQuery("#redo_action").live( "click", function() {
+  redoLastAction();
+});
+jQuery("#collapse_node").live( "click", function() {
+  collapse_node();
+});
+jQuery("#expand_node").live( "click", function() {
+  expand_node();
+});
+
+/* KEY PRESS HANDLER */
+
+// handles key presses
+jQuery(document).keydown( function( event ) {
+  if( window.event ) {  // for IE compatibility
+    var keyCode = window.event.keyCode;
+  }
+  else {
+    var keyCode = event.which;
+  }
+  switch( keyCode ) {
+
+    // adding child node with Tab or Insert
+    case 9: // Tab key
+    case 45:  // Insert key
+      // prevent default action of the event from happening (i.e. prevent Tab from moving focus)
+      event.preventDefault();
+      create_child();
+      break;
+
+    // adding sibling node with Enter, or updating entered node name
+    case 13: // Enter key
+      // adding sibling node with Enter
+      // only allow adding of a node if another node is not in editing mode
+      if( !inEditing ) {
+        create_sibling();
+      }
+      // updating entered node name
+      else {
+        // updates the current (last clicked) node's name
+        updateNode( st.clickedNode, jQuery("input").val() );
+      }
+      break;
+
+    // enabling editing node name with F2
+    case 113: // F2 key
+      update_name();
+      break;
+
+    // deleting node (and its children if it has them) with Backspace or Delete
+    case 8: // Backspace key
+    case 46:  // Delete key
+      // only allow deleting of a node if another node is not in editing mode
+      if( !inEditing ) {
+        // prevent default action of the event from happening only if a node is not in editing mode (i.e. prevent Backspace from going back a page when a node's not in editing mode, but still allow Backspace and Delete when typing new node name in its editing mode since it's an input field)
+        event.preventDefault();
+        delete_node();
+      }
+      break;
+
+    // navigating left, to parent node, with Arrow Left
+    case 37:  // Arrow Left key
+      // only allow navigation if a node's not in editing mode
+      if( !inEditing ) {
+        // prevent default action of the event from happening only if a node is not in editing mode (i.e. prevent scrolling the page left, but still allow Arrow Left when typing new node name in its editing mode since it's an input field)
+        event.preventDefault();
+
+        if( st.clickedNode.id !== st.root ) { // if it's not the root node
+          // the current (last clicked) node's parent's JSON ID
+          var parent_JSONid = getParentNode( st.clickedNode ).id;
+
+          // selects parent
+          st.onClick( parent_JSONid );
+        }
+      }
+      break;
+
+    // navigating right, to first child node, with Arrow Right
+    case 39:  // Arrow Right key
+      // only allow navigation if a node's not in editing mode
+      if( !inEditing ) {
+        // prevent default action of the event from happening only if a node is not in editing mode (i.e. prevent scrolling the page right, but still allow Arrow Right when typing new node name in its editing mode since it's an input field)
+        event.preventDefault();
+
+        if( st.clickedNode.anySubnode("exist") ) {  // if it has any children
+          // expand node if it's collapsed
+          if( st.clickedNode.collapsed ) {  // if the node is collapsed
+            customExpand( st.clickedNode );
+          }
+
+          // selects first child
+          st.onClick( st.clickedNode.getSubnodes()[1].id );
+        }
+      }
+      break;
+
+    // navigating up depth with Arrow Up
+    case 38:  // Arrow Up key
+      // only allow navigation if a node's not in editing mode
+      if( !inEditing ) {
+        // prevent default action of the event from happening only if a node is not in editing mode (i.e. prevent scrolling the page up, but still allow Arrow Up when typing new node name in its editing mode since it's an input field)
+        event.preventDefault();
+
+        if( st.clickedNode.id !== st.root ) { // if it's not the root node
+          // the current (last clicked) node's parent
+          var parentNode = getParentNode( st.clickedNode );
+
+          // stores current (last clicked) node's parent's direct children nodes into an array
+          var directChildren = new Array();
+          parentNode.eachSubnode( function( n ) {
+            directChildren.push( n );
+          });
+
+          // iterates through current (last clicked) node's parent's direct children
+          jQuery.each( directChildren, function( i, v ) {
+            if( v.id === st.clickedNode.id ) {  // if the child's node ID matches the current (last clicked) node's node ID
+              if( i > 0 ) { // ensure the child isn't the first one (i is 0-based indexing)
+                // selects the current (last clicked) node's previous sibling, which is its parent's (i-1)-th child (current node is (i)-th child)
+                st.onClick( directChildren[i-1].id );
+                return; // break out of each() loop early
+              }
+              else {
+                // don't do anything if it's already the first child
+                return; // break out of each() loop early
+              }
+            }
+          });
+        }
+      }
+      break;
+
+    // navigating down depth with Arrow Down
+    case 40:  // Arrow Down key
+      // only allow navigation if a node's not in editing mode
+      if( !inEditing ) {
+        // prevent default action of the event from happening only if a node is not in editing mode (i.e. prevent scrolling the page down, but still allow Arrow Down when typing new node name in its editing mode since it's an input field)
+        event.preventDefault();
+
+        if( st.clickedNode.id !== st.root ) { // if it's not the root node
+          // the current (last clicked) node's parent
+          var parentNode = getParentNode( st.clickedNode );
+
+          // counts current (last clicked) node's parent's direct children nodes (count is 1-based "indexing"), and stores the direct children nodes into an array
+          var count = 0;
+          var directChildren = new Array();
+          parentNode.eachSubnode( function( n ) {
+            count++;
+            directChildren.push( n );
+          });
+          // whether or not the child node is the next sibling; needed because directChildren[i+1] is not truly defined
+          var isNextSibling = false;
+
+          // iterates through current (last clicked) node's parent's direct children
+          jQuery.each( directChildren, function( i, v ) {
+            if( v.id === st.clickedNode.id ) {  // if the child's node ID matches the current (last clicked) node's node ID
+              if( i < count ) { // ensure the child isn't the last one (i is 0-based indexing)
+                isNextSibling = true;
+                return true;  // return true to skip to next iteration
+              }
+              else {
+                // don't do anything if it's already the last child
+                return; // break out of each() loop early
+              }
+            }
+            if( isNextSibling ) { // if the child node is the next sibling
+              // selects the current (last clicked) node's next sibling
+              st.onClick( directChildren[i].id );
+              return; // break out of each() loop early
+            }
+          });
+        }
+      }
+      break;
+
+    // ensuring the Ctrl key is down with the Z or Y keys to allow undo or redo
+    case 17:  // Ctrl key
+      ctrlDown = true;
+      break;
+
+    // undoing last action
+    case 90:  // Z key
+      // only allow undoing if the Ctrl key is down
+      if( ctrlDown ) {
+        undoLastAction();
+      }
+      break;
+
+    // redoing last action
+    case 89:  // Y key
+      // only allow redoing if the Ctrl key is down
+      if( ctrlDown ) {
+        redoLastAction();
+      }
+      break;
+
+    // ensuring the Shift key is down with the Equal key to allow expand
+    case 16:  // Shift key
+      shiftDown = true;
+      break;
+
+    // collapsing node
+    case 109: // Subtract key
+    case 189: // Minus key
+      collapse_node();
+      break;
+
+    // expanding node
+    case 107: // Add key
+      expand_node();
+      break;
+    case 187: // Equal key
+      // only allow expanding with the Equal key if the Shift key is down
+      if( shiftDown ) {
+        expand_node();
+      }
+      break;
+
+  }
+}).keyup( function( event ) {
+  if( window.event ) {  // for IE compatibility
+    var keyCode = window.event.keyCode;
+  }
+  else {
+    var keyCode = event.which;
+  }
+  switch( keyCode ) {
+
+    // ensuring the Ctrl key is down with the Z or Y keys to allow undo or redo - when the Ctrl key is released, then the Ctrl key isn't down anymore
+    case 17:  // Ctrl key
+      ctrlDown = false;
+      break;
+
+    // ensuring the Shift key is down with the Equal key to allow expand - when the Shift key is released, then the Shift key isn't down anymore
+    case 16:  // Shift key
+      shiftDown = false;
+      break;
+
+  }
+});
+
+/* ACTIONS ON CLICKED NODE: for links and key presses */
+
+// adding child node
+function create_child() {
+  // only allow adding of a node if another node is not in editing mode
+  if( !inEditing ) {
+    if( st.clickedNode.anySubnode("exist") ) {  // if it has any children
+      // expand node if it's collapsed
+      if( st.clickedNode.collapsed ) {  // if the node is collapsed
+        customExpand( st.clickedNode );
+      }
+    }
+
+    // creates child node to the current (last clicked) node
+    createChildNode( st.clickedNode );
+  }
+}
+
+// adding sibling node
+function create_sibling() {
+  // only allow the sibling node to be added if the current (last clicked) node is not a FSD node
+  if( (st.clickedNode.id !== st.root) && (st.clickedNode._depth % 4 !== 0) ) {  // if the node is not at node depth 0 (root), 4, and 8, etc.
+    // creates sibling node to the current (last clicked) node
+    createSiblingNode( st.clickedNode );
+  }
+  // warns the user that s/he cannot add another base FSD node
+  else {
+    alert( "You may only have one base function structure diagram!" );
+  }
+}
+
+// enabling editing node name
+function update_name() {
+  // only allow editing of a node if it's not already in editing mode
+  if( !inEditing ) {
+    enableUpdateNode( st.clickedNode );
+  }
+}
+
+// deleting node (and its children if it has them)
+function delete_node() {
+  // only allow deleting of a node if another node is not in editing mode
+  if( !inEditing ) {
+    // only allow the current (last clicked) node (and its children if it has them) to be deleted if it's not the base FSD node, which is the root node
+    if( st.clickedNode.id !== st.root ) {
+      if( st.clickedNode.anySubnode("exist") ) {  // if the current (last clicked) node has any children (Note: Not soft-deleting children because they won't be rendered in the tree without a parent in it)
+        if( confirm("Are you sure you would like to delete \""+st.clickedNode.name+"\" and its sub-node(s)?") ) { // confirms if the user wants to delete the current (last clicked) node
+          // soft-deletes the current (last clicked) node
+          deleteNode( st.clickedNode, "soft" );
+        }
+      }
+      else {
+        // soft-deletes the current (last clicked) node
+        deleteNode( st.clickedNode, "soft" );
+      }
+    }
+    // warns the user that s/he cannot delete the base FSD node
+    else {
+      alert( "You may not delete the base function structure diagram!" );
+    }
+  }
+}
+
+// see undoLastAction() for undoing last action
+
+// see redoLastAction() for redoing last action
+
+// collapsing node
+function collapse_node() {
+  // only allow collapsing if a node's not in editing mode
+  if( !inEditing ) {
+    if( !st.clickedNode.collapsed ) {
+      st.op.contract( st.clickedNode ); // collapse it; node is set to collapsed
+      st.onClick( st.clickedNode.id );
+    }
+  }
+}
+
+// expanding node
+function expand_node() {
+  // only allow expanding if a node's not in editing mode
+  if( !inEditing ) {
+    if( st.clickedNode.collapsed ) {
+      customExpand( st.clickedNode );
+      st.onClick( st.clickedNode.id );
+    }
+  }
+}
+
+/* REST FUNCTIONS */
 
 // REST: creates child node in the database and, on success, in the SpaceTree
 function createChildNode( node, doing ) {
@@ -235,6 +547,18 @@ function createChildNode( node, doing ) {
                   hideLabels: false
                 });
 
+                // the current node's dom name in the project tree area
+                var resource_dom = getNodeInfo( node, "resource dom" );
+                // the child's dom name in the project tree area
+                var child_dom = getNodeInfo( node, "child resource dom" );
+                // updates project tree area with added node
+                jQuery("#"+resource_id+"_"+resource_dom+"_ul").append("<li class='"+child_dom+"_li' id='"+child_id+"_"+child_dom+"_li'>  <span class='expansion_mark' id='"+child_id+"_"+child_dom+"_expansion_mark'></span>  <span class='"+child_dom+"_icon icon' id='"+child_id+"_"+child_dom+"_icon'><img src='/images/"+child_dom+".jpg'></span>  <span class='"+child_dom+"_list_title list_title new_list_title' id='"+child_id+"_"+child_dom+"_list_title'>"+newNodeName+"</span>  <a style='display:none'>"+newNodeName+"</a>  <ul class='"+child_dom+"_ul' id='"+child_id+"_"+child_dom+"_ul'></ul>  </li>");
+
+                // if the current node is new and doesn't have an expansion image because it's children-less until now, add an expansion image
+                if( jQuery("#"+resource_id+"_"+resource_dom+"_ul").prevAll("#"+resource_id+"_"+resource_dom+"_expansion_mark").children().length === 0 ) {  // if no expansion image
+                  jQuery("#"+resource_id+"_"+resource_dom+"_expansion_mark").append("<img src='/images/expanded.gif' class='new_expansion_img'>");
+                }
+
                 // selects the new node (highlights and centers the tree), as if it were clicked
                 st.onClick( child_JSONid );
 
@@ -282,6 +606,22 @@ function createChildNode( node, doing ) {
             st.addSubtree( newNode, "replot", {
               hideLabels: false
             });
+
+            // the current node's database ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
+            var resource_id = node.id.slice(0,-4);
+            // the current node's dom name in the project tree area
+            var resource_dom = getNodeInfo( node, "resource dom" );
+            // the child's dom name in the project tree area
+            var child_dom = getNodeInfo( node, "child resource dom" );
+            // the child's database ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
+            var child_id = newNodeJSON.id.slice(0,-4);
+            // updates project tree area with added node
+            jQuery("#"+resource_id+"_"+resource_dom+"_ul").append("<li class='"+child_dom+"_li' id='"+child_id+"_"+child_dom+"_li'>  <span class='expansion_mark' id='"+child_id+"_"+child_dom+"_expansion_mark'></span>  <span class='"+child_dom+"_icon icon' id='"+child_id+"_"+child_dom+"_icon'><img src='/images/"+child_dom+".jpg'></span>  <span class='"+child_dom+"_list_title list_title new_list_title' id='"+child_id+"_"+child_dom+"_list_title'>"+newNodeName+"</span>  <a style='display:none'>"+newNodeName+"</a>  <ul class='"+child_dom+"_ul' id='"+child_id+"_"+child_dom+"_ul'></ul>  </li>");
+
+            // if the current node is new and doesn't have an expansion image because it's children-less until now, add an expansion image
+            if( jQuery("#"+resource_id+"_"+resource_dom+"_ul").prevAll("#"+resource_id+"_"+resource_dom+"_expansion_mark").children().length === 0 ) {  // if no expansion image
+              jQuery("#"+resource_id+"_"+resource_dom+"_expansion_mark").append("<img src='/images/expanded.gif' class='new_expansion_img'>");
+            }
 
             // selects the new node (highlights and centers the tree), as if it were clicked
             st.onClick( newNodeJSON.id );
@@ -349,6 +689,11 @@ function createChildNode( node, doing ) {
             //compute node positions and layout
             st.compute();
 
+            // the node's dom name in the project tree area
+            var resource_dom = getNodeInfo( lastNode, "resource dom" );
+            // updates project tree area with restored node(s) - shows (un-hides) them
+            jQuery("#"+resource_id+"_"+resource_dom+"_li").show();
+
             // selects the restored node
             st.onClick( lastNode.id );
 
@@ -393,6 +738,17 @@ function createSiblingNode( node ) {
       st.addSubtree( newNode, "replot", {
         hideLabels: false
       });
+
+      // the current node's parent's database ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
+      var parent_id = parent_JSONid.slice(0,-4);
+      // the current node's parent's dom name in the project tree area
+      var parent_dom = getNodeInfo( getParentNode( node ), "resource dom" );
+      // the sibling's dom name in the project tree area, which is the same as the node's
+      var sibling_dom = getNodeInfo( node, "resource dom" );
+      // the sibling's database ID; gets by removing the last 4 characters ("_[resource]") of its JSON ID to take only the numeric part
+      var sibling_id = newNodeJSON.id.slice(0,-4);
+      // updates project tree area with added node
+      jQuery("#"+parent_id+"_"+parent_dom+"_ul").append("<li class='"+sibling_dom+"_li' id='"+sibling_id+"_"+sibling_dom+"_li'>  <span class='expansion_mark' id='"+sibling_id+"_"+sibling_dom+"_expansion_mark'></span>  <span class='"+sibling_dom+"_icon icon' id='"+sibling_id+"_"+sibling_dom+"_icon'><img src='/images/"+sibling_dom+".jpg'></span>  <span class='"+sibling_dom+"_list_title list_title new_list_title' id='"+sibling_id+"_"+sibling_dom+"_list_title'>"+newNodeName+"</span>  <a style='display:none'>"+newNodeName+"</a>  <ul class='"+sibling_dom+"_ul' id='"+sibling_id+"_"+sibling_dom+"_ul'></ul>  </li>");
 
       // selects the new node (highlights and centers the tree), as if it were clicked
       st.onClick( newNodeJSON.id );
@@ -468,6 +824,11 @@ function updateNode( node, nodeName, doing ) {
       // changes node's current name to the new name, which is the value of the input field in the node; the text replaces the input field
       jQuery("#"+node.id).text(nodeName);
 
+      // the node's dom name in the project tree area
+      var resource_dom = getNodeInfo( node, "resource dom" );
+      // updates project tree area with new name
+      jQuery("#"+resource_id+"_"+resource_dom+"_list_title").text(nodeName);
+
       if( (doing !== "undo") && (doing !== "redo") ) {  // if the node name is not updated in an undo or redo
         // done editing
         inEditing = false;
@@ -498,7 +859,7 @@ function deleteNode( node, condition, doing ) {
     deleteData = null;
   }
 
-  // soft-deletes node in database
+  // deletes node in database
   jQuery.ajax( {
     type: deleteType,
     url: "/"+resource+"/"+resource_id,
@@ -509,6 +870,11 @@ function deleteNode( node, condition, doing ) {
       st.removeSubtree( node.id, true, "animate", { // "replot" doesn't work for an unknown reason, but duration is already set to 0 to disable animations
         hideLabels: false
       });
+
+      // the node's dom name in the project tree area
+      var resource_dom = getNodeInfo( node, "resource dom" );
+      // updates project tree area with deleted node(s) - hides instead of removes in case user undoes
+      jQuery("#"+resource_id+"_"+resource_dom+"_li").hide();
 
       // the node's parent's JSON ID
       var parent_JSONid = getParentNode( node ).id;
@@ -526,283 +892,232 @@ function deleteNode( node, condition, doing ) {
   });
 };
 
-// undoes last action
+// undoes last action, if it wasn't already the same undo
 function undoLastAction() {
-  if( !unDone ) { // if the last action isn't "undo"
-    if( lastAction === "create" ) {
-      // ensures a non-base FSD is not hard-deleted, as it was automatically created with a concept
-      if( lastNode._depth % 4 === 0 ) {  // if the node is at node depth 4, 8, or 12, etc.
-        deleteNode( lastNode, "soft", "undo" );
+  // only allow undoing if another node is not in editing mode
+  if( !inEditing ) {
+    if( (lastAction !== undoneAction) || (lastNode !== undoneNode) ) {  // if the same action and node were not undone (can't simply test if the last ation was not an undo because the last action can either be an undo or redo; and need this condition otherwise graph reloads on this node)
+      if( lastAction === "create" ) {
+        // ensures a non-base FSD is not hard-deleted, as it was automatically created with a concept
+        if( lastNode._depth % 4 === 0 ) {  // if the node is at node depth 4, 8, or 12, etc.
+          deleteNode( lastNode, "soft", "undo" );
+        }
+        else {
+          // hard-deletes the created node; reasoning is that the table shouldn't be cluttered with soft-deleted entries that have no children, since "undo" is only valid for one action without a page refresh
+          deleteNode( lastNode, "hard", "undo" );
+        }
       }
-      else {
-        // hard-deletes the created node; reasoning is that the table shouldn't be cluttered with soft-deleted entries that have no children, since "undo" is only valid for one action without a page refresh
-        deleteNode( lastNode, "hard", "undo" );
+      else if( lastAction === "update" ) {
+        updateNode( lastNode, lastName, "undo" );
       }
+      else if( lastAction === "delete" ) {
+        createChildNode( lastParentNode, "undo" );
+      }
+      // disable successive undo for the same action and node
+      undoneAction = lastAction;
+      undoneNode = lastNode;
+      // enable redo next
+      canRedo = true;
     }
-    else if( lastAction === "update" ) {
-      updateNode( lastNode, lastName, "undo" );
-    }
-    else if( lastAction === "delete" ) {
-      createChildNode( lastParentNode, "undo" );
-    }
-    // done undo; disable successive undo
-    unDone = true;
   }
 };
 
-// redoes last action, if it was undone
+// redoes last action, if it was an undo
 function redoLastAction() {
-  if( unDone ) {  // if the last action is "undo"
-    if( lastAction === "create" ) {
-      createChildNode( lastParentNode, "redo" );
+  // only allow redoing if another node is not in editing mode
+  if( !inEditing ) {
+    if( canRedo ) {  // if the last action is "undo"
+      if( lastAction === "create" ) {
+        createChildNode( lastParentNode, "redo" );
+      }
+      else if( lastAction === "update" ) {
+        updateNode( lastNode, newName, "redo" );
+      }
+      else if( lastAction === "delete" ) {  // deliberately not asking confirmation, since it's unnecessary
+        deleteNode( lastNode, "soft" );
+      }
+      // enable undo for this redo next (set to null because both the undo and redo actions use the same lastAction and lastNode)
+      undoneAction = null;
+      undoneNode = null;
+      // disable successive redo
+      canRedo = false;
     }
-    else if( lastAction === "update" ) {
-      updateNode( lastNode, newName, "redo" );
-    }
-    else if( lastAction === "delete" ) {  // deliberately not asking confirmation, since it's unnecessary
-      deleteNode( lastNode, "soft" );
-    }
-    // done redo (not undo); enable successive undo
-    unDone = false;
   }
 };
 
-// handles key presses
-jQuery(document).keydown( function( event ) {
-  if( window.event ) {  // for IE compatibility
-    var keyCode = window.event.keyCode;
+/* HELPER FUNCTIONS FOR REST AND SPACETREE */
+
+// returns the requested information of a node (with an optional 3rd parameter of a value that needs to be set), depending on the node's depth
+function getNodeInfo( node, info, value ) {
+  // the node is a Function Structure Diagram
+  if( (node.id === st.root) || (node._depth % 4 === 0) ) {  // if the node is at node depth 0 (root), 4, or 8, etc.
+    if( info === "resource" ) {
+      return "function_structure_diagrams";
+    }
+    else if( info === "resource name" ) {
+      return "Function Structure Diagram";
+    }
+    else if( info === "resource dom" ) {
+      return "function_structure_diagram";
+    }
+    else if( info === "child resource" ) {
+      return "functions";
+    }
+    else if( info === "child resource name" ) {
+      return "Function";
+    }
+    else if( info === "child resource dom" ) {
+      return "function";
+    }
+    else if( info === "post child data" ) {
+      return { "function":{ "name":value, "function_structure_diagram_id":node.id.slice(0,-4) } };
+    }
+    // no "else if( info === "post sibling data" )"
+    else if( info === "put data" ) {
+      return { "function_structure_diagram":{ "name":value } };
+    }
+    else if( info === "delete data" ) {
+      return { "function_structure_diagram":{ "deleted":value } };
+    }
   }
-  else {
-    var keyCode = event.which;
+
+  // the node is a Function
+  else if( node._depth % 4 === 1 ) {  // if the node is at node depth 1, 5, or 9, etc.
+    if( info === "resource" ) {
+      return "functions";
+    }
+    else if( info === "resource name" ) {
+      return "Function";
+    }
+    else if( info === "resource dom" ) {
+      return "function";
+    }
+    else if( info === "child resource" ) {
+      return "concept_categories";
+    }
+    else if( info === "child resource name" ) {
+      return "Concept Category";
+    }
+    else if( info === "child resource dom" ) {
+      return "concept_category";
+    }
+    else if( info === "post child data" ) {
+      return { "concept_category":{ "name":value, "function_id":node.id.slice(0,-4) } };
+    }
+    else if( info === "post sibling data" ) {
+      return { "function":{ "name":"New Function", "function_structure_diagram_id":value } };
+    }
+    else if( info === "put data" ) {
+      return { "function":{ "name":value } };
+    }
+    else if( info === "delete data" ) {
+      return { "function":{ "deleted":value } };
+    }
   }
-  switch( keyCode ) {
 
-    // adding child node with Tab or Insert
-    case 9: // Tab key
-    case 45:  // Insert key
-      // prevent default action of the event from happening (i.e. prevent Tab from moving focus)
-      event.preventDefault();
-      // only allow adding of a node if another node is not in editing mode
-      if( !inEditing ) {
-        // creates child node to the current (last clicked) node
-        createChildNode( st.clickedNode );
-      }
-      break;
-
-    // adding sibling node with Enter, or updating entered node name
-    case 13: // Enter key
-      // adding sibling node with Enter
-      // only allow adding of a node if another node is not in editing mode
-      if( !inEditing ) {
-        // only allow the sibling node to be added if the current (last clicked) node is not a FSD node
-        if( (st.clickedNode.id !== st.root) && (st.clickedNode._depth % 4 !== 0) ) {  // if the node is not at node depth 0 (root), 4, and 8, etc.
-          // creates sibling node to the current (last clicked) node
-          createSiblingNode( st.clickedNode );
-        }
-        // warns the user that s/he cannot add another base FSD node
-        else {
-          alert( "You may only have one base function structure diagram!" );
-        }
-      }
-      // updating entered node name
-      else {
-        // updates the current (last clicked) node's name
-        updateNode( st.clickedNode, jQuery("input").val() );
-      }
-      break;
-
-    // enabling editing node name with F2
-    case 113: // F2 key
-      // only allow editing of a node if it's not already in editing mode
-      if( !inEditing ) {
-        enableUpdateNode( st.clickedNode );
-      }
-      break;
-
-    // deleting node (and its children if it has them) with Backspace or Delete
-    case 8: // Backspace key
-    case 46:  // Delete key
-      // only allow deleting of a node if another node is not in editing mode
-      if( !inEditing ) {
-        // prevent default action of the event from happening only if a node is not in editing mode (i.e. prevent Backspace from going back a page when a node's not in editing mode, but still allow Backspace and Delete when typing new node name in its editing mode since it's an input field)
-        event.preventDefault();
-
-        // only allow the current (last clicked) node (and its children if it has them) to be deleted if it's not the base FSD node, which is the root node
-        if( st.clickedNode.id !== st.root ) {
-          if( st.clickedNode.anySubnode("exist") ) {  // if the current (last clicked) node has any children (Note: Not soft-deleting children because they won't be rendered in the tree without a parent in it)
-            if( confirm("Are you sure you would like to delete \""+st.clickedNode.name+"\" and its sub-node(s)?") ) { // confirms if the user wants to delete the current (last clicked) node
-              // soft-deletes the current (last clicked) node
-              deleteNode( st.clickedNode, "soft" );
-            }
-          }
-          else {
-            // soft-deletes the current (last clicked) node
-            deleteNode( st.clickedNode, "soft" );
-          }
-        }
-        // warns the user that s/he cannot delete the base FSD node
-        else {
-          alert( "You may not delete the base function structure diagram!" );
-        }
-      }
-      break;
-
-    // navigating left, to parent node, with Arrow Left
-    case 37:  // Arrow Left key
-    // only allow navigation if a node's not in editing mode
-      if( !inEditing ) {
-        if( st.clickedNode.id !== st.root ) { // if it's not the root node
-          // the current (last clicked) node's parent's JSON ID
-          var parent_JSONid = getParentNode( st.clickedNode ).id;
-
-          // selects parent
-          st.onClick( parent_JSONid );
-        }
-      }
-      break;
-
-    // navigating right, to first child node, with Arrow Right
-    case 39:  // Arrow Right key
-    // only allow navigation if a node's not in editing mode
-      if( !inEditing ) {
-        if( st.clickedNode.anySubnode("exist") ) {  // if it has any children
-          // expand node if it's collapsed
-          if( st.clickedNode.collapsed ) {  // if the node is collapsed
-            // stores the current node's collapsed children nodes into an array
-            var collapsedChildren = new Array();
-            jQuery.each( st.clickedNode.getSubnodes(1), function( i, v ) {  // starting from its first child, not itself (as getSubnodes() would do)
-              if( v.collapsed ) {
-                collapsedChildren.push( v );
-                v.collapsed = false;
-              }
-            });
-
-            st.op.expand( st.clickedNode ); // expand it; node is set to not collapsed
-
-            // if there were collapsed children nodes, re-collapse the children that were previously set to collapse, as expanding the current node had expanded all its children too
-            if( collapsedChildren.length ) {
-              jQuery.each( collapsedChildren, function( i, v ) {
-                st.op.contract( v );
-              });
-            }
-          }
-
-          // selects first child
-          st.onClick( st.clickedNode.getSubnodes()[1].id );
-        }
-      }
-      break;
-
-    // navigating up depth with Arrow Up
-    case 38:  // Arrow Up key
-    // only allow navigation if a node's not in editing mode
-      if( !inEditing ) {
-        if( st.clickedNode.id !== st.root ) { // if it's not the root node
-          // the current (last clicked) node's parent
-          var parentNode = getParentNode( st.clickedNode );
-
-          // stores current (last clicked) node's parent's direct children nodes into an array
-          var directChildren = new Array();
-          parentNode.eachSubnode( function( n ) {
-            directChildren.push( n );
-          });
-
-          // iterates through current (last clicked) node's parent's direct children
-          jQuery.each( directChildren, function( i, v ) {
-            if( v.id === st.clickedNode.id ) {  // if the child's node ID matches the current (last clicked) node's node ID
-              if( i > 0 ) { // ensure the child isn't the first one (i is 0-based indexing)
-                // selects the current (last clicked) node's previous sibling, which is its parent's (i-1)-th child (current node is (i)-th child)
-                st.onClick( directChildren[i-1].id );
-                return; // break out of each() loop early
-              }
-              else {
-                // don't do anything if it's already the first child
-                return; // break out of each() loop early
-              }
-            }
-          });
-        }
-      }
-      break;
-
-    // navigating down depth with Arrow Down
-    case 40:  // Arrow Down key
-      // only allow navigation if a node's not in editing mode
-      if( !inEditing ) {
-        if( st.clickedNode.id !== st.root ) { // if it's not the root node
-          // the current (last clicked) node's parent
-          var parentNode = getParentNode( st.clickedNode );
-
-          // counts current (last clicked) node's parent's direct children nodes (count is 1-based "indexing"), and stores the direct children nodes into an array
-          var count = 0;
-          var directChildren = new Array();
-          parentNode.eachSubnode( function( n ) {
-            count++;
-            directChildren.push( n );
-          });
-          // whether or not the child node is the next sibling; needed because directChildren[i+1] is not truly defined
-          var isNextSibling = false;
-
-          // iterates through current (last clicked) node's parent's direct children
-          jQuery.each( directChildren, function( i, v ) {
-            if( v.id === st.clickedNode.id ) {  // if the child's node ID matches the current (last clicked) node's node ID
-              if( i < count ) { // ensure the child isn't the last one (i is 0-based indexing)
-                isNextSibling = true;
-                return true;  // return true to skip to next iteration
-              }
-              else {
-                // don't do anything if it's already the last child
-                return; // break out of each() loop early
-              }
-            }
-            if( isNextSibling ) { // if the child node is the next sibling
-              // selects the current (last clicked) node's next sibling
-              st.onClick( directChildren[i].id );
-              return; // break out of each() loop early
-            }
-          });
-        }
-      }
-      break;
-
-    // ensuring the Ctrl key is down with the Z or Y keys to allow undo or redo
-    case 17:  // Ctrl key
-      ctrlDown = true;
-      break;
-
-    // undoing last action
-    case 90:  // Z key
-      // only allow undoing if the Ctrl key is down and if a node's not already in editing mode
-      if( ctrlDown && !inEditing ) {
-        undoLastAction();
-      }
-      break;
-
-    // redoing last action
-    case 89:  // Y key
-      // only allow redoing if the Ctrl key is down and if a node's not already in editing mode
-      if( ctrlDown && !inEditing ) {
-        redoLastAction();
-      }
-      break;
-
+  // the node is a Concept Category
+  else if( node._depth % 4 === 2 ) {  // if the node is at node depth 2, 6, or 10, etc.
+    if( info === "resource" ) {
+      return "concept_categories";
+    }
+    else if( info === "resource name" ) {
+      return "Concept Category";
+    }
+    else if( info === "resource dom" ) {
+      return "concept_category";
+    }
+    else if( info === "child resource" ) {
+      return "concepts";
+    }
+    else if( info === "child resource name" ) {
+      return "Concept";
+    }
+    else if( info === "child resource dom" ) {
+      return "concept";
+    }
+    else if( info === "post child data" ) {
+      return { "concept":{ "name":value, "concept_category_id":node.id.slice(0,-4) } };
+    }
+    else if( info === "post sibling data" ) {
+      return { "concept_category":{ "name":"New Concept Category", "function_id":value } };
+    }
+    else if( info === "put data" ) {
+      return { "concept_category":{ "name":value } };
+    }
+    else if( info === "delete data" ) {
+      return { "concept_category":{ "deleted":value } };
+    }
   }
-}).keyup( function( event ) {
-  if( window.event ) {  // for IE compatibility
-    var keyCode = window.event.keyCode;
-  }
-  else {
-    var keyCode = event.which;
-  }
-  switch( keyCode ) {
 
-    // ensuring the Ctrl key is down with the Z or Y keys to allow undo or redo - when the Ctrl key is released, then the Ctrl key isn't down anymore
-    case 17:  // Ctrl key
-      ctrlDown = false;
-      break;
-
+  // the node is a Concept
+  else if( node._depth % 4 === 3 ) {  // if the node is at node depth 3, 7, or 11, etc.
+    if( info === "resource" ) {
+      return "concepts";
+    }
+    else if( info === "resource name" ) {
+      return "Concept";
+    }
+    else if( info === "resource dom" ) {
+      return "concept";
+    }
+    else if( info === "child resource" ) {
+      return "function_structure_diagrams";
+    }
+    else if( info === "child resource name" ) {
+      return "Function Structure Diagram";
+    }
+    else if( info === "child resource dom" ) {
+      return "function_structure_diagram";
+    }
+    else if( info === "post child data" ) { // actually "put child data" to update name
+      return { "function_structure_diagram":{ "name":value, "deleted":false } }; // no parent ID needed; must set deleted to false in case it was soft-deleted before
+    }
+    else if( info === "post sibling data" ) {
+      return { "concept":{ "name":"New Concept", "concept_category_id":value } };
+    }
+    else if( info === "put data" ) {
+      return { "concept":{ "name":value } };
+    }
+    else if( info === "delete data" ) {
+      return { "concept":{ "deleted":value } };
+    }
   }
-});
+};
+
+// returns a node's parent node
+function getParentNode( node ) {
+  if( node.id !== st.root ) { // if the node isn't the root node
+    // an array of the node's parent nodes
+    var parents = node.getParents();
+    // the number of parent nodes the node has
+    var numParents = parents.length;
+    // returns the node's parent node, which is the last one in the array
+    return parents[numParents-1];
+  }
+};
+
+// custom function to expand node, needed because it may have collapsed children nodes
+function customExpand( node ) {
+  // stores the current node's collapsed children nodes into an array
+  var collapsedChildren = new Array();
+  jQuery.each( node.getSubnodes(1), function( i, v ) {  // starting from its first child, not itself (as getSubnodes() would do)
+    if( v.collapsed ) {
+      collapsedChildren.push( v );
+      v.collapsed = false;
+    }
+  });
+
+  st.op.expand( node ); // expand node; node is set to not collapsed
+
+  // if there were collapsed children nodes, re-collapse the children that were previously set to collapse, as expanding the current node had expanded all its children too
+  if( collapsedChildren.length ) {
+    jQuery.each( collapsedChildren, function( i, v ) {
+      st.op.contract( v );
+    });
+  }
+}
+
+/* SPACETREE */
 
 // renders the SpaceTree with the JSON representation as a parameter
 //init data
@@ -982,32 +1297,16 @@ function initST( fsdJSON ) {
         else {
           if( node.id === st.clickedNode.id ) { // if user clicks the current (last clicked) node
             if( node.collapsed ) {  // if the node is collapsed
-              // stores the current node's collapsed children nodes into an array
-              var collapsedChildren = new Array();
-              jQuery.each( node.getSubnodes(1), function( i, v ) {  // starting from its first child, not itself (as getSubnodes() would do)
-                if( v.collapsed ) {
-                  collapsedChildren.push( v );
-                  v.collapsed = false;
-                }
-              });
-
-              st.op.expand( node ); // expand it; node is set to not collapsed
-
-              // if there were collapsed children nodes, re-collapse the children that were previously set to collapse, as expanding the current node had expanded all its children too
-              if( collapsedChildren.length ) {
-                jQuery.each( collapsedChildren, function( i, v ) {
-                  st.op.contract( v );
-                });
-              }
+              customExpand( node );
             }
             else {  // if the node is not collapsed
-              st.op.contract( node ); // collapse it; node is set to collapsed
+              st.op.contract( node ); // collapse node; node is set to collapsed
             }
           }
           // Note: uncomment else statement below if you want to automatically expand, upon a click, a non-current node that was set to collapsed before
           // else {
             // if( node.collapsed ) {  // if the node is collapsed
-              // st.op.expand( node ); // expand it; node is set to not collapsed
+              // customExpand( node );
             // }
           // }
         }

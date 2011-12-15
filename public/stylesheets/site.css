@@ -81,14 +81,15 @@ body {
 /* Form Styles */
 fieldset {
   -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;  /* for Chrome */
   background: #ddd;
-  height: 555px;
   margin: 10px;
   padding: 0;
 }
 
 legend {
   -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;  /* for Chrome */
   font-size: 16px;
   font-weight: bold;
   color: white;
@@ -98,25 +99,26 @@ legend {
 }
 
 label {
-  width: 10em;
+  width: 150px;
   float: left;
   text-align: right;
-  margin-right: 0.2em;
-  padding-top: 3px;
+  margin-right: 10px;
+  padding-top: 5px;
   display: block;
 }
 
 div {
   /* -moz-border-radius: 5px; */
+  /* -webkit-border-radius: 5px; */  /* for Chrome */
 }
 
 .form_row {
   white-space: nowrap;
-  padding: 5px 0px;
+  padding: 0px 0px 5px 0px;
 }
 
 .submit {
-  margin-left: 12.2em;
+  margin-left: 160px;
 }
 
 /* Debug Style */

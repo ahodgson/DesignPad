@@ -4,8 +4,8 @@
     <title><%= @title%></title>
 
     <%= stylesheet_link_tag "site" %>
-    
-    <%= stylesheet_link_tag "jit-base" %>
+
+    <%= stylesheet_link_tag "jit-base_full" %>
     <%= stylesheet_link_tag "jit-Spacetree" %>
 
 		<%= javascript_include_tag "jquery-1.7.min.js" %>
@@ -27,9 +27,15 @@
 
   <!-- render the JIT SpaceTree of the current FSD in its JSON representation (the FSD will be the root node) -->
   <body onload="initST( <%= @function_structure_diagram.to_json %> );">
-    Create Child (Tab / Insert) | Create Sibling (Enter) | Update Name (F2 / Right Click) | Delete (Backspace / Delete) | Undo (Ctrl + Z) | Redo (Ctrl + Y)<br>
-    Collapse Node | Expand Node | Centre Node | Refresh<br>
-    Export as Image
+    <a href="#" id="create_child">Create Child</a> (Tab / Insert) |
+    <a href="#" id="create_sibling">Create Sibling</a> (Enter) |
+    <a href="#" id="update_name">Update Name</a> (F2 / Right Click) |
+    <a href="#" id="delete_node">Delete</a> (Backspace / Delete) |
+    <a href="#" id="undo_action">Undo</a> (Ctrl + Z) |
+    <a href="#" id="redo_action">Redo</a> (Ctrl + Y)
+    <br>
+    <a href="#" id="collapse_node">Collapse Node</a> (-) |
+    <a href="#" id="expand_node">Expand Node</a> (+)
 
     <div id="infovis"></div>
   </body>

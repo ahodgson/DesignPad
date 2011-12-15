@@ -9,6 +9,8 @@ page.replace_html :known_objects_list_operations,
                                       #{instant_new('instant_li','known_object', KnownObject::NAME_SIZE, KnownObject::NAME_MAX_LENGTH, {:project_id=>@project.id})};",
                                     :class=>"pop_link")
 
+page.replace_html :project_view_legend, @project.name
+                                    
 page.replace_html :project_view_content, :partial=>"projects/project_overview", :locals=>{:project=>@project}
 
 #page<<"clearOperationBar()"
