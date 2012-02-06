@@ -21,13 +21,15 @@ page.replace_html :project_view_operations,
 page.hide :uploading_form
 
 # Show diagram
-page.replace_html :project_view_content, image_for_concept(@concept, "concept")
+# page.replace_html :project_view_content, image_for_concept(@concept, "concept")
 
-if @concept.avatar_file_name
-  page.replace_html :project_view_clue, link_to("(delete)", {:controller=>"concepts", :action=>"delete_picture", :id=>@concept.id}, :confirm=>'Are you sure to delete?')
-else
-  page.replace_html :project_view_clue, "No image found."
-end
+# if @concept.avatar_file_name
+  # page.replace_html :project_view_clue, link_to("(delete)", {:controller=>"concepts", :action=>"delete_picture", :id=>@concept.id}, :confirm=>'Are you sure to delete?')
+# else
+  # page.replace_html :project_view_clue, "No image found."
+# end
 
 #load comments
-page.replace_html :comments_area, :partial=>"comments/comments", :locals=>{:concept=>@concept}
+# page.replace_html :comments_area, :partial=>"comments/comments", :locals=>{:concept=>@concept}
+
+page.insert_html :bottom, :project_view_content, :partial=>"concepts/content", :locals=>{:concept=>@concept}

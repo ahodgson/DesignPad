@@ -82,7 +82,7 @@
   margin-left: 10px;
   margin-right: 10px;
   width: 630px;
-  height: 500px;
+  height: 550px;
   white-space: nowrap;
 }
 #new_known_object {
@@ -97,7 +97,7 @@
 /*============================ project tree style ============================*/
 #project_tree_area fieldset {
   float: left;
-  height: 555px;
+  height: 605px;
   width: 25%;
   margin: 0;
   padding: 10px;
@@ -109,7 +109,7 @@
 }
 #tree {
   background-color: white;
-  height: 500px;
+  height: 550px;
   margin: 0;
   padding: 0;
   overflow: auto;
@@ -223,7 +223,7 @@
 /*============================= project view style ========================*/
 #project_view_area fieldset {
   float: left;
-  height: 555px;
+  height: 605px;
   width: 55%;
   margin: 0px 0px 0px 10px;
   padding: 10px;
@@ -232,7 +232,7 @@
 
 #project_view_content {
   background-color: white;
-  height: 500px;
+  height: 550px;
   margin: 0;
   padding: 0;
   border: 1px solid gray;
@@ -244,10 +244,10 @@
 #project_view_content: hover, .hovered_content {
   border: 1px solid navy;
 }
-#project_view_content img {
-  height: 500px;
+/*#project_view_content img {
+  height: 550px;
   width: 600px;
-}
+}*/
 
 #project_view_clue {
   float: left;
@@ -290,7 +290,7 @@
 /*============================= object list style ===========================*/
 #known_objects_list_area fieldset {
   float: left;
-  height: 555px;
+  height: 605px;
   width: 10%;
   margin: 0px 0px 0px 10px;
   padding: 10px;
@@ -303,7 +303,7 @@
 #known_objects_list_content {
   text-align: center;
   background-color: white;
-  height: 500px;
+  height: 550px;
   margin: 0;
   padding: 0;
   overflow: auto;

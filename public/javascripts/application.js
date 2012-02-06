@@ -241,7 +241,18 @@ function click(element)
         element.dispatchEvent(evt);
     }
 }
-
+/* commented out to disable keypress in project tree area
+function simulateKeyDown(keyCode)
+{
+    // Create new event
+    var e = document.createEvent('KeyboardEvent');
+    // Init key event
+    //e.initKeyEvent(type, bubbles, cancelable, viewArg, ctrlKeyArg, altKeyArg, shiftKeyArg, metaKeyArg, keyCodeArg, charCodeArg)
+    e.initKeyEvent('keydown', true, true, window, false, false, false, false, keyCode, 0);
+    // Dispatch event into document
+    document.dispatchEvent(e);
+}
+*/
 function getUnifiedEvent(event)
 {
     var evt = event ? event : window.event;
@@ -593,6 +604,12 @@ function projectEditOnLoad()
 {
     instantInputFlag=true;
     inputFocus=false;
+    /* commented out to disable keypress in project tree area
+    document.onclick=projectEditOnClick;
+    document.onkeydown=projectEditOnKeyDown;
+    document.onkeypress=projectEditOnKeyPress;
+    document.onkeyup=projectEditOnKeyUp;
+  */
 }
 function projectEditOnClick(event)
 {
@@ -616,7 +633,120 @@ function projectEditOnClick(event)
 
     removeInstantInput();
 }
+/* commented out to disable keypress in project tree area
+function projectEditOnKeyDown(event)
+{
+    var evt = getUnifiedEvent(event)
+    var hoveredListTitle;
 
+    //input condition validation
+    if(evt.keyCode==27)
+        removeInstantInput();
+    if($('instant_li')||$('instant_edit_form')||inputFocus==true)
+        return true;
+
+    //assign title variables
+    if(getSelectedListTitle()==undefined)
+        return true;
+    else
+        hoveredListTitle=getHoveredListTitle();
+
+    switch(evt.keyCode)
+    {
+        case 37:
+        case 38:
+            setHover(previousListTitle(hoveredListTitle));
+            if(hoveredListTitle.getBoundingClientRect().top < $('project_tree_content').getBoundingClientRect().top)
+                $('project_tree_content').scrollTop-=20;
+            break;
+
+        case 39:
+        case 40:
+            setHover(nextListTitle(hoveredListTitle));
+            if(hoveredListTitle.getBoundingClientRect().bottom > $('project_tree_content').getBoundingClientRect().bottom)
+                $('project_tree_content').scrollTop+=20;
+            break;
+
+        default:
+            break;
+    }
+
+    // disable default onkeydown when not typing
+    // This must be checked at last when the above functions are performed.
+    if(!$('instant_textfield'))
+    {
+        if(evt.keyCode==9||evt.keyCode==37||evt.keyCode==38||evt.keyCode==39||evt.keyCode==40)
+            return false;
+    }
+
+    return true;
+}
+
+function projectEditOnKeyUp(event)
+{
+    var evt = getUnifiedEvent(event);
+    var selectedListTitle;
+    var hoveredListTitle;
+
+    //input condition validation
+    if(evt.keyCode==27)
+        removeInstantInput();
+    if($('instant_li')||$('instant_edit_form')||inputFocus==true)
+        return;
+
+    //assign title variables
+    if(getSelectedListTitle()==undefined)
+        return;
+    else
+    {
+        selectedListTitle=getSelectedListTitle();
+        hoveredListTitle=getHoveredListTitle();
+    }
+
+    switch(evt.keyCode)
+    {
+        //press return
+        case 13:
+            projectEditWhenEnterPressed(selectedListTitle, hoveredListTitle);
+            break;
+
+        //press tab
+        case 9:
+            projectEditWhenTabPressed(selectedListTitle);
+            break;
+
+        //ctrl+v
+        case 86:
+            if(evt.ctrlKey)
+            {
+                if(isOfClass('hovered_content', $('project_view_content')))
+                    pasteToClipBoard('project_view_content');
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    //select and focus to input field
+    if($('instant_textfield'))
+    {
+        $('instant_textfield').select();
+        $('instant_textfield').focus();
+    }
+}
+
+//currently not using
+function projectEditOnKeyPress(event)
+{
+    var evt = getUnifiedEvent(event);
+    switch(evt.keyCode)
+    {
+        default:
+            break;
+    }
+}
+*/
 function projectEditWhenEnterPressed(selectedListTitle, hoveredListTitle)
 {
     //select the hovered list title, if any

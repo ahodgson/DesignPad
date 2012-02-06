@@ -78,7 +78,7 @@ class ConceptsController < ApplicationController
     if not session[:project_id].nil?
       respond_to do |format|
         if @concept.update_attributes(params[:concept])
-          flash[:notice] = 'Concept was successfully updated.'
+          # flash[:notice] = 'Concept was successfully updated.'
           format.html { redirect_to :id=>session[:project_id], :action=>"edit", :controller=>"projects", :concept_id=>@concept.id }
           format.xml  { head :ok }
           format.js #update.rjs
@@ -132,7 +132,7 @@ class ConceptsController < ApplicationController
     end
   end
 
-   def delete_avatar
+  def delete_avatar
     @concept_id=params[:id]
     @concept=Concept.find(@concept_id)
 
