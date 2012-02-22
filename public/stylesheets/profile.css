@@ -27,21 +27,21 @@ input {
 .sidebar_box {
   background-color: #ddd;
   border: 1px solid #aaa;
-  font-size: 12px;
+  font-size: 14px;
   margin-bottom:  10px;
 }
 
 .sidebar_box h2 {
-   margin-top:  0px;
-   padding: 6px;
-   background-color: #ccc;
-   font-size: 13px;
-   color: navy;
-   font-weight:bold;
+  margin-top:  0px;
+  padding: 6px;
+  background-color: #ccc;
+  font-size: 16px;
+  color: navy;
+  font-weight: bold;
 }
 .sidebar_box p {
-   padding-left:  6px;
-   padding-right: 6px;
+  padding-left:  6px;
+  padding-right: 6px;
 }
 
 .sidebar_box .header  {
@@ -53,7 +53,7 @@ input {
 }
 
 #user_team_id{
-    min-width:100px;
+  min-width: 100px;
 }
 
 
@@ -118,13 +118,13 @@ input {
   min-height: 70px;
 }
 #new_comment_form{
-    cursor:-moz-grab;
-    position:absolute;
-    z-index:1000;
+  cursor: -moz-grab;
+  position: absolute;
+  z-index: 1000;
 }
 #new_comment_form fieldset{
-    max-width:550px;
-    max-height:100px;
+  max-width: 550px;
+  max-height: 100px;
 }
 
 .thumbnail {

@@ -27,6 +27,7 @@ class ConceptCategoriesController < ApplicationController
     respond_to do |format|
       format.html # show.rhtml
       format.xml  { render :xml => @concept_category.to_xml }
+      format.json { render json: @concept_category }
     end
   end
 
@@ -50,10 +51,11 @@ class ConceptCategoriesController < ApplicationController
 
     respond_to do |format|
       if @concept_category.save
-        flash[:notice] = 'ConceptCategory was successfully created.'
+        flash[:notice] = 'Concept Category was successfully created.'
         format.html { redirect_to concept_category_url(@concept_category) }
         format.xml  { head :created, :location => concept_category_url(@concept_category) }
         format.js #instant_create.rjs
+        format.json { render json: @concept_category, status: :created, location: @concept_category }
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @concept_category.errors.to_xml }
@@ -62,9 +64,9 @@ class ConceptCategoriesController < ApplicationController
             page.fail_instant_create
           end
         end
+        format.json { render json: @concept_category.errors, status: :unprocessable_entity }
       end
     end
-
   end
 
   # PUT /concept_categories/1
@@ -74,7 +76,7 @@ class ConceptCategoriesController < ApplicationController
 
     respond_to do |format|
       if @concept_category.update_attributes(params[:concept_category])
-        flash[:notice] = 'ConceptCategory was successfully updated.'
+        flash[:notice] = 'Concept Category was successfully updated.'
         format.html { redirect_to concept_category_url(@concept_category) }
         format.xml  { head :ok }
         format.js #update.rjs
@@ -94,7 +96,7 @@ class ConceptCategoriesController < ApplicationController
   # DELETE /concept_categories/1.xml
   def destroy
     @concept_category = ConceptCategory.find(params[:id])
-    
+
     if(@concept_category.name==ConceptCategory::NO_CATEGORY)
       respond_to do |format|
         format.js do
@@ -123,7 +125,7 @@ class ConceptCategoriesController < ApplicationController
   # called when list title is clicked
   def when_list_title_clicked
     @concept_category_id=params[:concept_category_id]
-    @concept_category=ConceptCategory.find(@concept_category_id)   
+    @concept_category=ConceptCategory.find(@concept_category_id)
     @function_structure_diagram=@concept_category.function.function_structure_diagram
     @entity_model_name='concept_category'
 
@@ -140,10 +142,10 @@ class ConceptCategoriesController < ApplicationController
 
     @concept_id=@element_to_move_id.split('_')[0]
     @concept=Concept.find(@concept_id)
-    
+
     @previous_concept_category_id=@concept.concept_category_id
     @previous_concept_category=ConceptCategory.find(@previous_concept_category_id)
-    
+
     @existing_concepts_for_post_category_before_drag=Concept.find(:all, :conditions=>['concept_category_id=?', @post_concept_category_id])
     @concept.update_attribute(:concept_category_id, @post_concept_category_id)
     @existing_concepts_for_previous_category_after_drag=Concept.find(:all, :conditions=>['concept_category_id=?', @previous_concept_category_id])

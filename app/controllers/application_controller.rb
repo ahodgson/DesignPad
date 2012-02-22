@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
   # @return: boolean value
   def protect
     unless logged_in?
-      session[:protected_page]=request.request_uri
+      session[:protected_page]=request.fullpath
       flash[:notice]="Please log in first"
       redirect_to :controller=>"user", :action=>"login"
       return false;

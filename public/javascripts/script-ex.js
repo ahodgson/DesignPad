@@ -1,5 +1,5 @@
 // load the mindmap
-        $(document).ready(function() {
+        $(function() {
             // enable the mindmap in the body
             $('#tree').mindmap();
 

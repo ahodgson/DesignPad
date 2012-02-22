@@ -5,9 +5,9 @@
 # @date: 12/24/2009
 
 class KnownObject < ActiveRecord::Base
-  has_many :functions
+  has_many :functions, :conditions => {:deleted => false}
   has_many :object_ownerships, :dependent=>:destroy
-  has_many :function_structure_diagrams, :through=>:object_ownerships
+  has_many :function_structure_diagrams, :through=>:object_ownerships, :conditions => {:deleted => false}
   belongs_to :project
 
   #Max & Min lengths for all fields

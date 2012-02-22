@@ -5,7 +5,7 @@
 # @date: 12/24/2009
 
 class FunctionStructureDiagram < ActiveRecord::Base
-  has_many :functions, :dependent=>:destroy
+  has_many :functions, :dependent=>:destroy, :conditions => {:deleted => false}
   has_many :object_ownerships, :dependent=>:destroy
   has_many :known_objects, :through=>:object_ownerships
   has_one :project, :dependent=>:destroy
@@ -16,21 +16,24 @@ class FunctionStructureDiagram < ActiveRecord::Base
   NAME_MIN_LENGTH = 1
   NAME_MAX_LENGTH = 100
   NAME_RANGE=NAME_MIN_LENGTH..NAME_MAX_LENGTH
-  
+
+  # validations
+  # validates_length_of :name, :within=>NAME_RANGE  # uncommented because breaks when concept gets created (with it), since it doesn't have a name then (used to check if FSD exists); therefore, will just have to sanitize in the inputs
+
   #Text box sizes for display in the views
   NAME_SIZE = 20
-  
+
   # Icon path
   ICON_PATH = '/images/function_structure_diagram.jpg'
 
   # Return the default function structure diagram name for project
   def self.default_name_for_project(project_name)
-    "Base FSD For "+project_name
+    "Base FSD for "+project_name
   end
 
   # Return the default function structure diagram name for concept
   def self.default_name_for_concept(concept_name)
-    "FSD For "+concept_name
+    "FSD for "+concept_name
   end
 
   # Return true if the function structure diagram name exists
@@ -73,5 +76,9 @@ class FunctionStructureDiagram < ActiveRecord::Base
   def diagram=(diagram_in)
     self.picture=diagram_in.read
   end
-  
+
+  # defines the JSON representation of the FSD objects to be rendered in the JIT SpaceTree
+  def as_json( options={} )
+    { :id => id.to_s + "_fsd", :name => name, :data => description, :children => functions }
+  end
 end
