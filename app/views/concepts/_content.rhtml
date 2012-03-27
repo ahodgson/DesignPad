@@ -1,0 +1,65 @@
+<div id="concept_sketch">
+  <fieldset>
+    <legend>Sketch</legend>
+
+    <div id="concept_content">
+      <!-- image -->
+      <% if concept.avatar_file_name %>
+        <%= image_tag(concept.avatar.url, :id =>"concept_image") %>
+      <% else %>
+        <%= image_tag("/images/none.jpg", :id =>"concept_image") %>
+      <% end %>
+
+      <!-- upload image -->
+      <div id="upload_image" style="display: none;">
+        <% form_for(concept, :url=>{:controller=>"concepts", :id=>concept.id, :action=>"update"}, :html => { :multipart => true }) do |f| %>
+          <h1>Upload New Sketch</h1>
+          From Computer: <%= f.file_field :avatar %><br><br>
+          From URL: <%= f.text_field :image_url %><br><br>
+          <%= submit_tag "Save" %>
+          <input type="button" class="cancel_concept_button" value="Cancel">
+        <% end %>
+      </div>
+
+      <!-- edit image -->
+      <div id="edit_image" style="display: none;">
+        <h1>Edit Sketch</h1>
+        <canvas id="concept_canvas"></canvas>
+        <br><br>
+        <input type="button" id="convert_png_button" value="Save">
+        <input type="button" class="reset_concept_button" value="Reset">
+        <input type="button" class="cancel_concept_button" id="cancel_edit" value="Cancel">
+        
+        <div style="display:none">
+          <% form_for(concept, :url=>{:controller=>"concepts", :id=>concept.id, :action=>"update"}, :html => { :multipart => true }) do |f| %>
+            <%= f.hidden_field :image_data %>
+            <%= submit_tag "Save", :id=>"real_save" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- sketch options -->
+    <span class="box_options">
+      <input type="button" class="upload_concept_button" value="Upload">
+      <input type="button" class="edit_concept_button" value="Edit">
+      <input type="button" id="<%= concept.id %>_delete_button" class="delete_concept_button" value="Delete">
+    </span>
+
+  </fieldset>
+</div>
+
+<div id="concept_objects">
+  <fieldset>
+    <legend>Objects</legend>
+
+    <%= collection_select(:known_object, :select_id, concept.function_structure_diagram.available_known_objects, :id, :name, {}, :multiple=>true) %>
+
+    <span class="box_options">
+      New |
+      Edit |
+      Delete
+    </span>
+
+  </fieldset>
+</div>

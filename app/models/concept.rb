@@ -7,7 +7,7 @@
 require 'open-uri'
 
 class Concept < ActiveRecord::Base
-	
+
   attr_accessor :image_url, :content_type, :original_filename, :image_data
   before_save :decode_base64_image
 
@@ -22,10 +22,10 @@ class Concept < ActiveRecord::Base
   NAME_MAX_LENGTH = 100
   DESCRIPTION_MIN_LENGTH = 5
   DESCRIPTION_MAX_LENGTH = 300
-  
+
   NAME_RANGE = NAME_MIN_LENGTH..NAME_MAX_LENGTH
   DESCRIPTION_RANGE = DESCRIPTION_MIN_LENGTH..DESCRIPTION_MAX_LENGTH
-  
+
   before_validation :download_remote_image, :if => :image_url_provided?
   validates_presence_of :image_remote_url, :if => :image_url_provided?, :message => 'is invalid or inaccessible'
 
@@ -42,7 +42,7 @@ class Concept < ActiveRecord::Base
   def known_objects
     self.function_structure_diagram.object_ownerships.collect{|object_ownership| object_ownership.known_object}
   end
-  
+
   # Returns the objects being used only by this concept
   def monopolized_known_objects
     objects=[]
@@ -70,10 +70,20 @@ class Concept < ActiveRecord::Base
     !(function_structure_diagram.nil? || function_structure_diagram.name.nil?)
   end
 
+  # Returns true if the concept's function structure diagram's "deleted" value is true (i.e. it was soft-deleted by the user in the JIT SpaceTree)
+  def fsd_is_deleted?
+    function_structure_diagram = self.function_structure_diagram
+    if( function_structure_diagram.deleted == true)
+      return true
+    else
+      return false
+    end
+  end
+
   # Create a concept and a function structure diagram without name for it
   def self.create_with_default_function_structure_diagram(user_id, concept_category_id, name)
-    transaction do 
-      @function_structure_diagram = FunctionStructureDiagram.new(:user_id=>user_id)     
+    transaction do
+      @function_structure_diagram = FunctionStructureDiagram.new(:user_id=>user_id)
       @function_structure_diagram.save!
       @concept = Concept.new( :user_id=>user_id,
                               :concept_category_id=>concept_category_id,
@@ -95,16 +105,16 @@ class Concept < ActiveRecord::Base
   def diagram=(diagram_in)
     self.picture=diagram_in.read
   end
-  
+
   # Override destroy
   def destroy
     transaction do
       super
       self.monopolized_known_objects.each{|known_object| known_object.destroy}
-      self.function_structure_diagram.destroy   
-    end 
+      self.function_structure_diagram.destroy
+    end
   end
- 
+
 #	Yelnil Gabo
 #	Summer 2011 Coop Internship
 #	Computer Science, year 4
@@ -113,30 +123,30 @@ class Concept < ActiveRecord::Base
   def image_url_provided?
     !self.image_url.blank?
   end
-  
+
   def download_remote_image
     self.avatar = do_download_remote_image
   end
-  
+
   def do_download_remote_image
     io = open(URI.parse(image_url))
     def io.original_filename; base_uri.path.split('/').last; end
     io.original_filename.blank? ? nil : io
   rescue # catch url errors with validations instead of exceptions (Errno::ENOENT, OpenURI::HTTPError, etc...)
   end
-  
+
 	# if uploaded pic was base64 handle here
 	def decode_base64_image
 		content_type      = 'image/png'
 		original_filename = 'screenshots.png'
-	
+
 		if !image_data.nil?
 			if !image_data.empty? && content_type && original_filename
-				
+
 				#cut off header "data:image/jpeg;base64,"
-				index = image_data.index(','); 
+				index = image_data.index(',');
 				decoded_data = Base64.decode64(image_data[index..-1])
-				 
+
 				data = StringIO.new(decoded_data)
 				data.class_eval do
 				  attr_accessor :content_type, :original_filename
@@ -149,5 +159,16 @@ class Concept < ActiveRecord::Base
 			end
 		end
 	end
-  
+
+  # defines the JSON representation of the concept objects to be rendered in the JIT SpaceTree
+  # if the concept's default FSD is not named (by the user), set children to an empty array, otherwise an empty node would render after the concept in the JIT SpaceTree; also render the FSD node only if its "deleted" value is false (i.e. wasn't soft-deleted by user)
+  # also include the function_structure_diagram_id as fsd_id in the JSON for the JIT SpaceTree to allow updating of the concept's FSD's name upon node creation in the JIT SpaceTree
+  def as_json( options={} )
+    if has_function_structure_diagram? && !fsd_is_deleted?
+      { :id => id.to_s + "_con", :name => name, :data => description, :children => [function_structure_diagram] }
+    else
+      { :id => id.to_s + "_con", :name => name, :data => description, :children => [], :fsd_id => function_structure_diagram_id.to_s + "_fsd" }
+    end
+  end
+
 end

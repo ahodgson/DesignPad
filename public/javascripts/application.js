@@ -241,7 +241,7 @@ function click(element)
         element.dispatchEvent(evt);
     }
 }
-
+/* commented out to disable keypress in project tree area
 function simulateKeyDown(keyCode)
 {
     // Create new event
@@ -252,7 +252,7 @@ function simulateKeyDown(keyCode)
     // Dispatch event into document
     document.dispatchEvent(e);
 }
-
+*/
 function getUnifiedEvent(event)
 {
     var evt = event ? event : window.event;
@@ -268,7 +268,7 @@ function getUnifiedTarget(event)
         targ = evt.srcElement
     if (targ.nodeType == 3) // defeat Safari bug
         targ = targ.parentNode
-    
+
     return targ;
 }
 
@@ -339,7 +339,7 @@ function toggleList(li_id)
     if($(li_id).getElementsByTagName('ul').length>0)
     {
         var ul_element=$(li_id).getElementsByTagName('ul')[0];
-    
+
         if(ul_element.style.display=="none")
             unfold($(li_id));
         else
@@ -373,12 +373,12 @@ function fold(li_element)
 
         if(getElementsByClassName('hovered_list_title').length>0)
         {
-            var hoveredListTitile=getElementsByClassName('hovered_list_title')[0];           
+            var hoveredListTitile=getElementsByClassName('hovered_list_title')[0];
             var listTitle=getElementsByClassName('list_title', li_element)[0];
             if(!isVisible(hoveredListTitile.parentNode))
                 makeUniqueClass('hovered_list_title', listTitle);
         }
-    }    
+    }
 }
 function unfold(li_element)
 {
@@ -388,7 +388,7 @@ function unfold(li_element)
         ul_element.style.display="";
         if(getElementsByClassName('expansion_mark', li_element)[0].getElementsByTagName('img').length>0)
             getElementsByClassName('expansion_mark', li_element)[0].getElementsByTagName('img')[0].src=expandedImagePath;
-    }    
+    }
 }
 
 function isFolded(li_element)
@@ -412,7 +412,7 @@ function isVisible(li_element)
     return true;
 }
 
-                
+
 //===============================Drag and Drops================================
 
 // These functions are not using because it fails to make new draggables when part
@@ -458,7 +458,7 @@ function resetProjectEditPage()
     //resetInstantCreateGlobalVariables();
     $('project_view_content').innerHTML="";
     $('project_view_operations').innerHTML="";
-    $('project_view_clue').innerHTML="";    
+    $('project_view_clue').innerHTML="";
     $('known_objects_list_content').innerHTML="";
     $('known_objects_list_operations').innerHTML="";
 }
@@ -511,7 +511,7 @@ function removeInstantInput()
             var listTitle=getElementsByClassName('list_title', $('instant_edit_form').parentNode)[0];
             Element.show(listTitle);
             Element.remove($('instant_edit_form'));
-        }           
+        }
     }
 }
 
@@ -525,7 +525,7 @@ function InstantLiHtml(type)
     var maxLength='';
     var parentIdName='';
     var parentIdValue='';
-    
+
     switch(type)
     {
         case 'sib':
@@ -565,7 +565,7 @@ function InstantLiHtml(type)
 function instantUlHtml()
 {
     //var instantUlHtml="<ul id='instant_ul'></ul>"
-    var instantUlHtml="<ul class='"+sibModel+"_ul' id='"+selfIdValue+"_"+sibModel+"_ul'></ul>"    
+    var instantUlHtml="<ul class='"+sibModel+"_ul' id='"+selfIdValue+"_"+sibModel+"_ul'></ul>"
     return instantUlHtml;
 }
 
@@ -573,8 +573,8 @@ function pictureClue(bool)
 {
     if(bool)
         $('project_view_clue').innerHTML='Showing image, please wait...';
-    else
-        $('project_view_clue').innerHTML='No image found.';
+    // else
+        // $('project_view_clue').innerHTML='No image found.';
 }
 
 function getSelectedListTitle()
@@ -604,19 +604,19 @@ function projectEditOnLoad()
 {
     instantInputFlag=true;
     inputFocus=false;
-
+    /* commented out to disable keypress in project tree area
     document.onclick=projectEditOnClick;
     document.onkeydown=projectEditOnKeyDown;
     document.onkeypress=projectEditOnKeyPress;
-    document.onkeyup=projectEditOnKeyUp;  
-    
+    document.onkeyup=projectEditOnKeyUp;
+  */
 }
 function projectEditOnClick(event)
 {
     //hide context menu
     var evt = getUnifiedEvent(event);
     if(evt.button!=2)
-    {   
+    {
         var popMenus=getElementsByClassName('pop_menu', document);
         if(popMenus.length>0)
         {
@@ -630,10 +630,10 @@ function projectEditOnClick(event)
 
     if(targ.id=='instant_textfield' || targ.className=='pop_link' || instantInputFlag==false)
         return;
-    
+
     removeInstantInput();
 }
-
+/* commented out to disable keypress in project tree area
 function projectEditOnKeyDown(event)
 {
     var evt = getUnifiedEvent(event)
@@ -666,7 +666,7 @@ function projectEditOnKeyDown(event)
             if(hoveredListTitle.getBoundingClientRect().bottom > $('project_tree_content').getBoundingClientRect().bottom)
                 $('project_tree_content').scrollTop+=20;
             break;
-            
+
         default:
             break;
     }
@@ -702,12 +702,12 @@ function projectEditOnKeyUp(event)
         selectedListTitle=getSelectedListTitle();
         hoveredListTitle=getHoveredListTitle();
     }
- 
+
     switch(evt.keyCode)
     {
         //press return
         case 13:
-            projectEditWhenEnterPressed(selectedListTitle, hoveredListTitle);          
+            projectEditWhenEnterPressed(selectedListTitle, hoveredListTitle);
             break;
 
         //press tab
@@ -746,7 +746,7 @@ function projectEditOnKeyPress(event)
             break;
     }
 }
-
+*/
 function projectEditWhenEnterPressed(selectedListTitle, hoveredListTitle)
 {
     //select the hovered list title, if any
@@ -816,7 +816,7 @@ function showContextMenu(element, event, menu_element)
 {
     var targ=getUnifiedTarget(event);
     var idNumber=element.id.split("_").first();
-    
+
     //var popMenu = document.getElementById('pop_menu');
     menu_element.style.top = event.clientY+document.documentElement.scrollTop+'px';
     menu_element.style.left = event.clientX+document.documentElement.scrollLeft+'px';
@@ -856,7 +856,7 @@ function previousLi(li_element)
     }
     else
         return false;
-    
+
 
 /*
     var previousListItem;
@@ -881,7 +881,7 @@ function previousListTitle(listTitle)
     var previousListItem=previousLi(listItem);
     var list=listItem.parentNode;
 
-    // case when its the first sibling 
+    // case when its the first sibling
     if(!previousListItem)
     {
         //case it still has parent list
@@ -914,8 +914,8 @@ function previousListTitle(listTitle)
                 {
                     if(previousList.getElementsByTagName('li')[j].id==lastPreviousListItem.id)
                         return getElementsByClassName('list_title', previousList.parentNode)[0];
-                }                
-            }                
+                }
+            }
         }
         //regular return
         return getElementsByClassName('list_title', lastPreviousListItem)[0];
@@ -947,7 +947,7 @@ function nextListTitle(listTitle)
 {
     var listItem=listTitle.parentNode;
     var list=listItem.parentNode;
-    
+
     // case when it has sub tree and its visible
     if(listItem.getElementsByTagName('li').length>0 && !isFolded(listItem))
     {
@@ -965,7 +965,7 @@ function nextListTitle(listTitle)
         {
             if(nextLi(list.parentNode))
                 return getElementsByClassName('list_title', nextLi(list.parentNode))[0];
-            
+
             if(list.parentNode.tagName=='LI')
                 list=list.parentNode.parentNode
             else
@@ -981,11 +981,11 @@ function nextListTitle(listTitle)
 function hideComments()
 {
     jQuery('#comments_area').hide('slow');
-    $('project_view_fieldset').style.height='500px';
+    // $('project_view_fieldset').style.height='500px';
 }
 function showComments()
 {
-    $('project_view_fieldset').style.height='770px';
+    // $('project_view_fieldset').style.height='770px';
     jQuery('#comments_area').show('slow');
 }
 
@@ -1030,4 +1030,40 @@ function getSelectedObject()
         return undefined;
 }
 
+// adds background colour when user hovers over the list title
+jQuery(".list_title").live( "mouseover", function() {
+  jQuery(this).addClass("hovered_list_title");
+});
+jQuery(".list_title").live( "mouseleave", function() {
+  jQuery(this).removeClass("hovered_list_title");
+});
 
+// indicates in the project view area's legend that the selected partial is loading, and hides JIT's bug of the label at page bottom when it's not a FSD that's clicked
+jQuery(".project_list_title").live( "click", function() {
+  jQuery("#project_view_legend").text("Loading project content, please wait...");
+  jQuery(".jit-autoadjust-label").hide();
+});
+jQuery(".function_structure_diagram_list_title").live( "click", function() {
+  jQuery("#project_view_legend").text("Loading function structure diagram content, please wait...");
+  jQuery(".jit-autoadjust-label").show();
+});
+jQuery(".function_list_title").live( "click", function() {
+  jQuery("#project_view_legend").text("Loading function content, please wait...");
+  jQuery(".jit-autoadjust-label").hide();
+});
+jQuery(".concept_category_list_title").live( "click", function() {
+  jQuery("#project_view_legend").text("Loading concept category content, please wait...");
+  jQuery(".jit-autoadjust-label").hide();
+});
+jQuery(".concept_list_title").live( "click", function() {
+  jQuery("#project_view_legend").text("Loading concept content, please wait...");
+  jQuery(".jit-autoadjust-label").hide();
+});
+
+// hides JIT's bug of the label at page bottom when it's a known object that's clicked
+jQuery(".project_known_object_list_title").live( "click", function() {
+  jQuery(".jit-autoadjust-label").hide();
+});
+jQuery(".unavailable_known_object_list_title").live( "click", function() {
+  jQuery(".jit-autoadjust-label").hide();
+});

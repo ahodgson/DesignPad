@@ -5,7 +5,7 @@
 # @date: 12/24/2009
 
 class Function < ActiveRecord::Base
-  has_many :concept_categories, :order=>"created_at DESC", :dependent=>:destroy
+  has_many :concept_categories, :dependent=>:destroy, :conditions => {:deleted => false} # took out :order=>"created_at DESC" because it causes the concept categories to be listed in a different created_at order than function structure diagrams, functions, and concepts
   belongs_to :function_structure_diagram 
   belongs_to :object1, :class_name=>"KnownObject", :foreign_key=>"object1_id"
   belongs_to :object2, :class_name=>"KnownObject", :foreign_key=>"object2_id"
@@ -48,5 +48,10 @@ class Function < ActiveRecord::Base
       
       return @function
     end
+  end
+  
+  # defines the JSON representation of the function objects to be rendered in the JIT SpaceTree
+  def as_json( options={} )
+    { :id => id.to_s + "_fnt", :name => name, :data => description, :children => concept_categories }
   end
 end

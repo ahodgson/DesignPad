@@ -4,21 +4,37 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title><%= @title%></title>
 		<%= csrf_meta_tag %>
+
 		<%= stylesheet_link_tag "site" %>
 		<%= stylesheet_link_tag "profile" %>
-        <%= stylesheet_link_tag "team" %>
-        <%= stylesheet_link_tag "project" %>
-        <%= stylesheet_link_tag "function" %>
+    <%= stylesheet_link_tag "team" %>
+    <%= stylesheet_link_tag "project" %>
+    <%= stylesheet_link_tag "function" %>
+    <%= stylesheet_link_tag "concept" %>
+
 		<!-- Note: a potential confliction w.r.t. stack push remains. -->
-		<%= javascript_include_tag "jquery-1.3.2.min.js"%>
-        <%= javascript_include_tag "jquery-ui-1.7.2.custom.min.js"%>              
-        <script type="text/javascript">
-            var jQuery=$;
-        </script>
-        <%= javascript_include_tag :defaults%>                  
+
+		<%= javascript_include_tag "jquery-1.7.min.js" %>
+    <%= javascript_include_tag "jquery-ui-1.7.2.custom.min.js" %>
+      <script type="text/javascript">
+        var jQuery=$;
+        jQuery.noConflict();
+      </script>
+
+    <!--[if IE]>
+      <%= javascript_include_tag "excanvas" %>
+    <![endif]-->
+    <%= javascript_include_tag "jit" %>
+    <%= javascript_include_tag "jit-spacetree" %>
+
+    <%= javascript_include_tag "base64" %>
+    <%= javascript_include_tag "canvas2image" %>
+    <%= javascript_include_tag "concept" %>
+
+    <%= javascript_include_tag :defaults %>
 	</head>
-	
-	<body onload="init();">
+
+	<body>
 		<div id="whole_page">
 			<div id="header">Design Pad</div>
 		 	<div id="nav">
@@ -32,9 +48,9 @@
 					<%end -%>
 		 		</span>
 		 		<%= nav_link "Home ", "site"%>|
-				<%= nav_link "About us ", "site", "about"%> | <%= nav_link "Tree", "site", "ex4"%>
+				<%= nav_link "About Us ", "site", "about"%> | <%= nav_link "Tree", "site", "ex4"%>
 			</div>
-			
+
 			<div id="content">
 				<%if flash[:notice] -%>
 					<div id="notice"><%= flash[:notice]%></div>
@@ -42,11 +58,8 @@
 				<%= @content_for_layout%>
 				<%= yield %>
 				<br clear="all"/>
-			</div>		
-		
+			</div>
+
 		</div>
 	</body>
 </html>
-
-
-
